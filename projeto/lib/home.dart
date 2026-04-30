@@ -15,7 +15,6 @@ class HomePage extends StatelessWidget {
         title: const Text("Home"),
         centerTitle: true,
 
-        // ⬅️ SETA VOLTA ATRÁS
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           onPressed: () {
@@ -26,12 +25,12 @@ class HomePage extends StatelessWidget {
 
       body: Column(
         children: [
-          // 🖼️ MAPA
+          // Mapa
           SizedBox(
             width: double.infinity,
             height: 200,
             child: Image.asset(
-              'assets/mapa.png',
+              'assets/Mapa.png',
               fit: BoxFit.cover,
             ),
           ),
@@ -58,7 +57,7 @@ class HomePage extends StatelessWidget {
 
           const Spacer(),
 
-          // 🔘 BARRA DE ÍCONES
+          //Barra de ícones
           Container(
             width: double.infinity,
             color: Colors.green,
@@ -66,11 +65,11 @@ class HomePage extends StatelessWidget {
               height: 60,
               child: Row(
                 children: [
-                  //MAPA (não faz nada)
+                  //Mapa (não faz nada)
                   _buildButton(Icons.map, () {}),
                   _divider(),
 
-                  //EVENTOS
+                  //Eventos
                   _buildButton(Icons.calendar_month, () {
                     Navigator.push(
                       context,
@@ -82,7 +81,7 @@ class HomePage extends StatelessWidget {
 
                   _divider(),
 
-                  //DOAÇÕES
+                  //Doações
                   _buildButton(Icons.volunteer_activism, () {
                     Navigator.push(
                       context,
@@ -94,7 +93,7 @@ class HomePage extends StatelessWidget {
 
                   _divider(),
 
-                  //MENSAGENS
+                  //Mensagens
                   _buildButton(Icons.message, () {
                     Navigator.push(
                       context,
@@ -106,7 +105,7 @@ class HomePage extends StatelessWidget {
 
                   _divider(),
 
-                  //INFO
+                  //Info
                   _buildButton(Icons.info, () {
                     Navigator.push(
                       context,
@@ -118,7 +117,7 @@ class HomePage extends StatelessWidget {
 
                   _divider(),
 
-                  //LOGOUT - volta ao Inicio da APP
+                  //Sair - volta ao Inicio da APP
                   _buildButton(Icons.logout, () {
                     Navigator.pushAndRemoveUntil(
                       context,
@@ -137,7 +136,6 @@ class HomePage extends StatelessWidget {
     );
   }
 
-  // ✅ ÍCONE
   Widget _buildButton(IconData icon, VoidCallback onTap) {
     return Expanded(
       child: InkWell(
@@ -149,7 +147,6 @@ class HomePage extends StatelessWidget {
     );
   }
 
-  // ✅ DIVISOR
   Widget _divider() {
     return Container(
       width: 1,

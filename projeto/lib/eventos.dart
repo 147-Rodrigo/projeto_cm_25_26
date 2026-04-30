@@ -56,7 +56,7 @@ class EventosPage extends StatelessWidget {
 
           const Spacer(),
 
-          // 🔘 Barra de ícones
+          //Barra de ícones
           Container(
             width: double.infinity,
             color: Colors.green,
@@ -64,7 +64,7 @@ class EventosPage extends StatelessWidget {
               height: 60,
               child: Row(
                 children: [
-                  //MAPA (não faz nada)
+                  //Mapa (não faz nada)
                   _buildButton(Icons.map, () {
                     Navigator.push(context, MaterialPageRoute(builder: (context) => const HomePage(),
                     ),
@@ -73,11 +73,11 @@ class EventosPage extends StatelessWidget {
 
                   _divider(),
 
-                  //EVENTOS
+                  //Eventos
                   _buildButton(Icons.calendar_month, () {}),
                   _divider(),
 
-                  //DOAÇÕES
+                  //Doações
                   _buildButton(Icons.volunteer_activism, () {
                     Navigator.push(
                       context,
@@ -89,7 +89,7 @@ class EventosPage extends StatelessWidget {
 
                   _divider(),
 
-                  //MENSAGENS
+                  //Mensagens
                   _buildButton(Icons.message, () {
                     Navigator.push(
                       context,
@@ -101,7 +101,7 @@ class EventosPage extends StatelessWidget {
 
                   _divider(),
 
-                  //INFO
+                  //Info
                   _buildButton(Icons.info, () {
                     Navigator.push(
                       context,
@@ -113,7 +113,7 @@ class EventosPage extends StatelessWidget {
 
                   _divider(),
 
-                  //LOGOUT - volta ao Inicio da APP
+                  //Sair - volta ao Inicio da APP
                   _buildButton(Icons.logout, () {
                     Navigator.pushAndRemoveUntil(
                       context,

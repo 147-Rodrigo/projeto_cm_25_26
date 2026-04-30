@@ -32,7 +32,7 @@ class StartPage extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            // IMAGEM
+            // Imagem
             Image.asset(
               'assets/logo.png',
               width: 200,
@@ -40,10 +40,10 @@ class StartPage extends StatelessWidget {
 
             const SizedBox(height: 40),
 
-            // BOTÃO Login
+            // Botão Login
             ElevatedButton(
               style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.green, // Cor de fundo do botão
+                backgroundColor: Colors.green, // Cor de fundo do Botão
                 foregroundColor: Colors.white, // Cor do texto
               ),
               onPressed: () {
@@ -57,10 +57,10 @@ class StartPage extends StatelessWidget {
 
             const SizedBox(height: 20),
 
-            // BOTÃO Registo
+            // Botão Registo
             ElevatedButton(
               style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.green, // Cor de fundo do botão
+                backgroundColor: Colors.green, // Cor de fundo do Botão
                 foregroundColor: Colors.white, // Cor do texto
               ),
               onPressed: () {

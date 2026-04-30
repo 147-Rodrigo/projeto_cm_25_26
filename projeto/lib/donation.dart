@@ -80,7 +80,7 @@ class DonationPage extends StatelessWidget {
 
           const Spacer(),
 
-          // 🔘 Barra de ícones
+          //Barra de ícones
           Container(
             width: double.infinity,
             color: Colors.green,
@@ -88,7 +88,7 @@ class DonationPage extends StatelessWidget {
               height: 60,
               child: Row(
                 children: [
-                  //MAPA
+                  //Mapa
                   _buildButton(Icons.map, () {
                     Navigator.push(context, MaterialPageRoute(builder: (context) => const HomePage(),
                     ),
@@ -97,7 +97,7 @@ class DonationPage extends StatelessWidget {
 
                   _divider(),
 
-                  //EVENTOS
+                  //Eventos
                   _buildButton(Icons.calendar_month, () {
                     Navigator.push(context, MaterialPageRoute(builder: (context) => const EventosPage(),
                     ),
@@ -105,11 +105,11 @@ class DonationPage extends StatelessWidget {
                   }),
                   _divider(),
 
-                  //DOAÇÕES (não faz nada)
+                  //Doações (não faz nada)
                   _buildButton(Icons.volunteer_activism, () {}),
                   _divider(),
 
-                  //MENSAGENS
+                  //Mensagens
                   _buildButton(Icons.message, () {
                     Navigator.push(
                       context,
@@ -121,7 +121,7 @@ class DonationPage extends StatelessWidget {
 
                   _divider(),
 
-                  //INFO
+                  //Info
                   _buildButton(Icons.info, () {
                     Navigator.push(
                       context,
@@ -133,7 +133,7 @@ class DonationPage extends StatelessWidget {
 
                   _divider(),
 
-                  //LOGOUT - volta ao Inicio da APP
+                  //Sair - volta ao Inicio da APP
                   _buildButton(Icons.logout, () {
                     Navigator.pushAndRemoveUntil(
                       context,

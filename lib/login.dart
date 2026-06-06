@@ -1,110 +1,178 @@
 import 'package:flutter/material.dart';
-import 'registo.dart';
+
+import 'Style/custom_appbar.dart';
+import 'Style/text_styles.dart';
+
 import 'home.dart';
+import 'registo.dart';
+import 'main.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
 
   @override
-  _LoginPageState createState() => _LoginPageState();
+  State<LoginPage> createState() => _LoginPageState();
 }
 
 class _LoginPageState extends State<LoginPage> {
+
+  // Chave do formulário
   final _formKey = GlobalKey<FormState>();
-  final TextEditingController _emailController = TextEditingController();
-  final TextEditingController _passwordController = TextEditingController();
+
+  // Controladores dos campos
+  final _emailController = TextEditingController();
+  final _passwordController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
+
     return Scaffold(
-      appBar: AppBar(
-        title: const Text("Login"),
+
+      // Barra superior
+      appBar: CustomAppBar(
+        title: "Login",
+
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
+
           onPressed: () {
             Navigator.pushAndRemoveUntil(
               context,
-              MaterialPageRoute(builder: (context) => const HomePage()),
-              (Route<dynamic> route) => false,
+              MaterialPageRoute(
+                builder: (context) => const StartPage(),
+              ),
+              (route) => false,
             );
           },
         ),
       ),
+
+      // Corpo da página
       body: Padding(
-        padding: const EdgeInsets.all(16.0),
+        padding: const EdgeInsets.all(16),
+
         child: Form(
           key: _formKey,
+
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
-            children: <Widget>[
-              // Campo de Email
+
+            children: [
+
+              // Espaço
+              const SizedBox(height: 30),
+
+              // Ícone do utilizador
+              const CircleAvatar(
+                radius: 55,
+                backgroundColor: Colors.green,
+
+                child: Icon(
+                  Icons.person,
+                  size: 60,
+                  color: Colors.white,
+                ),
+              ),
+
+              const SizedBox(height: 30),
+
+              // Campo Email
               TextFormField(
                 controller: _emailController,
+
+                keyboardType: TextInputType.emailAddress,
+
                 decoration: const InputDecoration(
                   labelText: "Email",
                   border: OutlineInputBorder(),
                 ),
+
                 validator: (value) {
+
                   if (value == null || value.isEmpty) {
-                    return 'Por favor, insira o seu email';
+                    return "Insira o email";
                   }
+
                   return null;
                 },
-                keyboardType: TextInputType.emailAddress,
               ),
+
               const SizedBox(height: 16),
 
-              // Campo de Senha
+              // Campo Password
               TextFormField(
                 controller: _passwordController,
+
+                obscureText: true,
+
                 decoration: const InputDecoration(
                   labelText: "Senha",
                   border: OutlineInputBorder(),
                 ),
-                obscureText: true,
+
                 validator: (value) {
+
                   if (value == null || value.isEmpty) {
-                    return 'Por favor, insira a sua senha';
+                    return "Insira a senha";
                   }
+
                   return null;
                 },
               ),
+
               const SizedBox(height: 24),
 
-              // Botão de Login
+              // Botão Entrar
               ElevatedButton(
+
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.green,
                   foregroundColor: Colors.white,
                 ),
-                onPressed: () {
-                  if (_formKey.currentState!.validate()) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text('Login bem-sucedido')));
-                  };
 
-                  Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const HomePage()),
-                  ); 
+                onPressed: () {
+
+                  // Verifica se os campos estão válidos
+                  if (_formKey.currentState!.validate()) {
+
+                    // Mensagem
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text("Login bem-sucedido"),
+                      ),
+                    );
+
+                    // Vai para a Home
+                    Navigator.pushReplacement(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const HomePage(),
+                      ),
+                    );
+                  }
                 },
-                child: const Text('Entrar'),
+
+                child: const Text("Entrar"),
               ),
 
               const SizedBox(height: 16),
 
+              // Texto para criar conta
               GestureDetector(
+
                 onTap: () {
+
                   Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (context) => const RegistoPage()),
+                    MaterialPageRoute(
+                      builder: (context) => const RegistoPage(),
+                    ),
                   );
                 },
+
                 child: const Text(
-                  "Não tem uma conta? Registe-se",
-                  style: TextStyle(
-                    color: Colors.green,
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                  ),
+                  "Não tem conta? Registe-se",
+                  style: AppTextStyles.linkText,
                 ),
               ),
             ],

@@ -1,4 +1,8 @@
 import 'package:flutter/material.dart';
+
+import 'Style/custom_appbar.dart';
+import 'Style/text_styles.dart';
+
 import 'login.dart';
 import 'main.dart';
 
@@ -6,118 +10,183 @@ class RegistoPage extends StatefulWidget {
   const RegistoPage({super.key});
 
   @override
-  _RegistoPageState createState() => _RegistoPageState();
+  State<RegistoPage> createState() => _RegistoPageState();
 }
 
 class _RegistoPageState extends State<RegistoPage> {
+
+  // Chave do formulário
   final _formKey = GlobalKey<FormState>();
-  final TextEditingController _nomeController = TextEditingController();
-  final TextEditingController _emailController = TextEditingController();
-  final TextEditingController _senhaController = TextEditingController();
+
+  // Controladores
+  final _nomeController = TextEditingController();
+  final _emailController = TextEditingController();
+  final _senhaController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
+
     return Scaffold(
-      appBar: AppBar(
-        title: const Text("Registo"),
+
+      // Barra superior
+      appBar: CustomAppBar(
+        title: "Registo",
+
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
+
           onPressed: () {
+
             Navigator.pushAndRemoveUntil(
               context,
-              MaterialPageRoute(builder: (context) => const StartPage()),
-              (Route<dynamic> route) => false,
+              MaterialPageRoute(
+                builder: (context) => const StartPage(),
+              ),
+              (route) => false,
             );
           },
         ),
       ),
+
+      // Corpo da página
       body: Padding(
-        padding: const EdgeInsets.all(16.0),
+        padding: const EdgeInsets.all(16),
+
         child: Form(
           key: _formKey,
+
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
-            children: <Widget>[
+
+            children: [
+
+              // Espaço
+              const SizedBox(height: 30),
+
+              // Avatar
+              const CircleAvatar(
+                radius: 55,
+                backgroundColor: Colors.green,
+
+                child: Icon(
+                  Icons.person,
+                  size: 60,
+                  color: Colors.white,
+                ),
+              ),
+
+              const SizedBox(height: 30),
+
               // Campo Nome
               TextFormField(
                 controller: _nomeController,
+
                 decoration: const InputDecoration(
                   labelText: "Nome Completo",
                   border: OutlineInputBorder(),
                 ),
+
                 validator: (value) {
+
                   if (value == null || value.isEmpty) {
-                    return 'Por favor, insira o seu nome completo';
+                    return "Insira o nome completo";
                   }
+
                   return null;
                 },
               ),
+
               const SizedBox(height: 16),
 
               // Campo Email
               TextFormField(
                 controller: _emailController,
+
+                keyboardType: TextInputType.emailAddress,
+
                 decoration: const InputDecoration(
                   labelText: "Email",
                   border: OutlineInputBorder(),
                 ),
+
                 validator: (value) {
+
                   if (value == null || value.isEmpty) {
-                    return 'Por favor, insira o seu email';
+                    return "Insira o email";
                   }
+
                   return null;
                 },
-                keyboardType: TextInputType.emailAddress,
               ),
+
               const SizedBox(height: 16),
 
               // Campo Senha
               TextFormField(
                 controller: _senhaController,
+
+                obscureText: true,
+
                 decoration: const InputDecoration(
                   labelText: "Senha",
                   border: OutlineInputBorder(),
                 ),
-                obscureText: true,
+
                 validator: (value) {
+
                   if (value == null || value.isEmpty) {
-                    return 'Por favor, insira a sua senha';
+                    return "Insira a senha";
                   }
+
                   return null;
                 },
               ),
+
               const SizedBox(height: 24),
 
-              // Botão de Registo
+              // Botão Registar
               ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.green,
-                foregroundColor: Colors.white,
-              ),
+
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.green,
+                  foregroundColor: Colors.white,
+                ),
+
                 onPressed: () {
+
+                  // Validação
                   if (_formKey.currentState!.validate()) {
+
+                    // Mensagem
                     ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text('Registo bem-sucedido')));
+                      const SnackBar(
+                        content: Text("Registo bem-sucedido"),
+                      ),
+                    );
                   }
                 },
-                child: const Text('Registar'),
+
+                child: const Text("Registar"),
               ),
-              
+
               const SizedBox(height: 16),
 
+              // Ir para Login
               GestureDetector(
+
                 onTap: () {
+
                   Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (context) => const LoginPage()),
+                    MaterialPageRoute(
+                      builder: (context) => const LoginPage(),
+                    ),
                   );
                 },
-                child: const Text("Já tem uma conta? Faça Login",
-                  style: TextStyle(
-                    color: Colors.green,
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                  ),
+
+                child: const Text(
+                  "Já tem conta? Faça Login",
+                  style: AppTextStyles.linkText,
                 ),
               ),
             ],

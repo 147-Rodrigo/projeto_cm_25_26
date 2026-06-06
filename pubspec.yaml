@@ -11,6 +11,10 @@ dependencies:
   flutter:
     sdk: flutter
   cupertino_icons: ^1.0.8
+  google_maps_flutter: ^2.17.1
+  flutter_polyline_points: ^2.0.0
+  dio: ^5.7.0
+
 
 dev_dependencies:
   flutter_test:
@@ -22,7 +26,4 @@ flutter:
   assets:
     - assets/logo.png
     - assets/mapa.png
-    - assets/eventos.png
-    - assets/doações.png
-    - assets/forum.png
-    - assets/info.png
+    - assets/doações/

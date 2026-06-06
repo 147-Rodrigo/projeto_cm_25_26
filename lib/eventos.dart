@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
+import 'Style/custom_appbar.dart';
+import 'Style/text_styles.dart';
 import 'home.dart';
 import 'donation.dart';
 import 'forum.dart';
 import 'info.dart';
+import 'perfil.dart';
 import 'main.dart';
 
 class EventosPage extends StatelessWidget {
@@ -11,50 +14,67 @@ class EventosPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text("Eventos"),
-        centerTitle: true,
-
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
-          onPressed: () {
-            Navigator.pop(context);
-          },
-        ),
+      appBar: CustomAppBar(
+        title: "Eventos",
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.newspaper),
+            onPressed: () {},
+          ),
+          IconButton(
+            icon: const Icon(Icons.notifications),
+            onPressed: () {},
+          ),
+          IconButton(
+            icon: const Icon(Icons.person),
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const PerfilPage(),
+                  ),
+                );
+              }),
+        ],
       ),
 
       body: Column(
         children: [
-          SizedBox(
-            width: double.infinity,
-            height: 200,
-            child: Image.asset(
-              'assets/eventos.png',
-              fit: BoxFit.cover,
+          Expanded(
+            child: SingleChildScrollView(
+              child: Column(
+                children: [
+
+                  const SizedBox(height: 20),
+
+                  const Text(
+                    "Eventos",
+                    style: AppTextStyles.welcomeTitle,
+                  ),
+
+                  const SizedBox(height: 20),
+
+                  _buildInfoBox(
+                    Icons.cleaning_services,
+                    "Limpeza Verde Comunitária",
+                    "15 de junho de 2026",
+                    "Ação de recolha de lixo e reciclagem em espaços públicos.",
+                  ),
+
+                  const SizedBox(height: 15),
+
+                  _buildInfoBox(
+                    Icons.calendar_month,
+                    "Dia da Reciclagem Ativa",
+                    "3 de julho de 2026",
+                    "Atividades rápidas para promover a separação correta de resíduos.",
+                  ),
+
+                  const SizedBox(height: 20),
+                ],
+              ),
             ),
           ),
-
-          const SizedBox(height: 20),
-
-          const Text(
-            "Lista de Eventos",
-            style: TextStyle(
-              fontSize: 20,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-
-          const SizedBox(height: 10),
-
-          const Text(
-            "Limpeza Verde Comunitária",
-            style: TextStyle(
-              fontSize: 14,
-              color: Colors.black,
-            ),
-          ),
-
-          const Spacer(),
 
           //Barra de ícones
           Container(
@@ -64,9 +84,12 @@ class EventosPage extends StatelessWidget {
               height: 60,
               child: Row(
                 children: [
-                  //Mapa (não faz nada)
+                  //Mapa
                   _buildButton(Icons.map, () {
-                    Navigator.push(context, MaterialPageRoute(builder: (context) => const HomePage(),
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const HomePage(),
                     ),
                     );
                   }),
@@ -113,7 +136,7 @@ class EventosPage extends StatelessWidget {
 
                   _divider(),
 
-                  //Sair - volta ao Inicio da APP
+                  // LOGOUT
                   _buildButton(Icons.logout, () {
                     Navigator.pushAndRemoveUntil(
                       context,
@@ -132,12 +155,16 @@ class EventosPage extends StatelessWidget {
     );
   }
 
-  Widget _buildButton(IconData icon, VoidCallback onTap) {
+Widget _buildButton(IconData icon, VoidCallback onTap) {
     return Expanded(
       child: InkWell(
         onTap: onTap,
         child: Center(
-          child: Icon(icon, color: Colors.white, size: 28),
+          child: Icon(
+            icon,
+            color: Colors.white,
+            size: 28,
+          ),
         ),
       ),
     );
@@ -150,4 +177,83 @@ class EventosPage extends StatelessWidget {
       color: Colors.white30,
     );
   }
+}
+
+// ==========================
+// INFO BOX
+// ==========================
+
+Widget _buildInfoBox(
+  IconData icon,
+  String username,
+  String date,
+  String text,
+) {
+  return Container(
+    width: double.infinity,
+
+    margin: const EdgeInsets.symmetric(
+      horizontal: 20,
+      vertical: 5,
+    ),
+
+    padding: const EdgeInsets.all(16),
+
+    decoration: BoxDecoration(
+      color: const Color.fromRGBO(171, 255, 156, 1),
+      borderRadius: BorderRadius.circular(15),
+    ),
+
+    child: Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+
+        // FOTO + NOME + DATA
+        Row(
+          children: [
+
+            // ÍCONE
+            CircleAvatar(
+              radius: 25,
+              backgroundColor: Colors.green,
+              child: Icon(
+                icon,
+                color: Colors.white,
+                size: 28,
+              ),
+            ),
+
+            const SizedBox(width: 12),
+
+            // NOME + DATA
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+
+                Text(
+                  username,
+                  style: AppTextStyles.forumUsername,
+                ),
+
+                const SizedBox(height: 4),
+
+                Text(
+                  date,
+                  style: AppTextStyles.forumDate,
+                ),
+              ],
+            ),
+          ],
+        ),
+
+        const SizedBox(height: 15),
+
+        // TEXTO
+        Text(
+          text,
+          style: AppTextStyles.forumText,
+        ),
+      ],
+    ),
+  );
 }

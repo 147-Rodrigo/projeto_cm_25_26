@@ -5,6 +5,7 @@ import 'home.dart';
 import 'eventos.dart';
 import 'donation.dart';
 import 'forum.dart';
+import 'perfil.dart';
 import 'main.dart';
 
 class InfoPage extends StatelessWidget {
@@ -14,7 +15,7 @@ class InfoPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: CustomAppBar(
-        title: "Guia Formativo",
+        title: "Guia",
         actions: [
           IconButton(
             icon: const Icon(Icons.newspaper),
@@ -26,8 +27,14 @@ class InfoPage extends StatelessWidget {
           ),
           IconButton(
             icon: const Icon(Icons.person),
-            onPressed: () {},
-          ),
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const PerfilPage(),
+                  ),
+                );
+              }),
         ],
       ),
 
@@ -190,10 +197,10 @@ class InfoPage extends StatelessWidget {
   }
 }
 
-// ✔️ InfoBox (correto e reutilizável)
+//InfoBox
 Widget _buildInfoBox(String title, String text) {
   return Container(
-    width: double.infinity, // 👈 força largura total
+    width: double.infinity,
 
     margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 5),
 

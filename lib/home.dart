@@ -1,4 +1,9 @@
 import 'package:flutter/material.dart';
+
+import 'API/maps.dart';
+import 'Style/custom_appbar.dart';
+
+import 'perfil.dart';
 import 'eventos.dart';
 import 'donation.dart';
 import 'forum.dart';
@@ -11,65 +16,60 @@ class HomePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text("Home"),
-        centerTitle: true,
+      appBar: CustomAppBar(
+        title: "Home",
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.newspaper),
+            onPressed: () {},
+          ),
 
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
-          onPressed: () {
-            Navigator.pop(context);
-          },
-        ),
+          IconButton(
+            icon: const Icon(Icons.notifications),
+            onPressed: () {},
+          ),
+
+          IconButton(
+            icon: const Icon(Icons.person),
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const PerfilPage(),
+                ),
+              );
+            },
+          ),
+        ],
       ),
 
       body: Column(
         children: [
-          // Mapa
-          SizedBox(
-            width: double.infinity,
-            height: 200,
-            child: Image.asset(
-              'assets/Mapa.png',
-              fit: BoxFit.cover,
+
+          // MAPA
+          Expanded(
+            child: SizedBox.expand(
+              child: Maps(),
             ),
           ),
 
-          const SizedBox(height: 20),
-
-          const Text(
-            "Bem-vindo à EcoLoop",
-            style: TextStyle(
-              fontSize: 20,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-
-          const SizedBox(height: 10),
-
-          const Text(
-            "Navegue entre as páginas",
-            style: TextStyle(
-              fontSize: 14,
-              color: Colors.black,
-            ),
-          ),
-
-          const Spacer(),
-
-          //Barra de ícones
+          // BARRA INFERIOR
           Container(
             width: double.infinity,
             color: Colors.green,
+
             child: SizedBox(
               height: 60,
+
               child: Row(
                 children: [
-                  //Mapa (não faz nada)
+
+                  // MAPA
                   _buildButton(Icons.map, () {}),
+
                   _divider(),
 
-                  //Eventos
+                  // EVENTOS
                   _buildButton(Icons.calendar_month, () {
                     Navigator.push(
                       context,
@@ -81,7 +81,7 @@ class HomePage extends StatelessWidget {
 
                   _divider(),
 
-                  //Doações
+                  // DOAÇÕES
                   _buildButton(Icons.volunteer_activism, () {
                     Navigator.push(
                       context,
@@ -93,7 +93,7 @@ class HomePage extends StatelessWidget {
 
                   _divider(),
 
-                  //Mensagens
+                  // FÓRUM
                   _buildButton(Icons.message, () {
                     Navigator.push(
                       context,
@@ -105,7 +105,7 @@ class HomePage extends StatelessWidget {
 
                   _divider(),
 
-                  //Info
+                  // INFO
                   _buildButton(Icons.info, () {
                     Navigator.push(
                       context,
@@ -117,7 +117,7 @@ class HomePage extends StatelessWidget {
 
                   _divider(),
 
-                  //Sair - volta ao Inicio da APP
+                  // LOGOUT
                   _buildButton(Icons.logout, () {
                     Navigator.pushAndRemoveUntil(
                       context,
@@ -136,18 +136,26 @@ class HomePage extends StatelessWidget {
     );
   }
 
-  Widget _buildButton(IconData icon, VoidCallback onTap) {
+  static Widget _buildButton(
+    IconData icon,
+    VoidCallback onTap,
+  ) {
     return Expanded(
       child: InkWell(
         onTap: onTap,
+
         child: Center(
-          child: Icon(icon, color: Colors.white, size: 28),
+          child: Icon(
+            icon,
+            color: Colors.white,
+            size: 28,
+          ),
         ),
       ),
     );
   }
 
-  Widget _divider() {
+  static Widget _divider() {
     return Container(
       width: 1,
       height: 30,

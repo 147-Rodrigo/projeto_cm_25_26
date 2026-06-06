@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
+import 'Style/custom_appbar.dart';
+import 'Style/text_styles.dart';
 import 'home.dart';
 import 'eventos.dart';
 import 'forum.dart';
 import 'info.dart';
+import 'perfil.dart';
 import 'main.dart';
 
 class DonationPage extends StatelessWidget {
@@ -11,74 +14,87 @@ class DonationPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text("Doações"),
-        centerTitle: true,
-
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
-          onPressed: () {
-            Navigator.pop(context);
-          },
-        ),
+      appBar: CustomAppBar(
+        title: "Doações",
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.newspaper),
+            onPressed: () {},
+          ),
+          IconButton(
+            icon: const Icon(Icons.notifications),
+            onPressed: () {},
+          ),
+          IconButton(
+            icon: const Icon(Icons.person),
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const PerfilPage(),
+                  ),
+                );
+              }),
+        ],
       ),
 
       body: Column(
         children: [
-          SizedBox(
-            width: double.infinity,
-            height: 200,
-            child: Image.asset(
-              'assets/doações.png',
-              fit: BoxFit.cover,
+          Expanded(
+            child: SingleChildScrollView(
+              child: Column(
+                children: [
+
+                  const SizedBox(height: 20),
+
+                  const Text(
+                    "Doar",
+                    style: AppTextStyles.welcomeTitle,
+                  ),
+
+                  const SizedBox(height: 20),
+
+                  _buildInfoBox(
+                    "Cáritas Portuguesa",
+                    "assets/doações/caritas.png",
+                    ),
+
+                  const SizedBox(height: 15),
+
+                  _buildInfoBox(
+                    "Banco Alimentar Contra a Fome",
+                    "assets/doações/banco_alimentar.png",
+                    ),
+
+                  const SizedBox(height: 15),
+
+                  _buildInfoBox("Comunidade Vida e Paz",
+                  "assets/doações/comunidade_vida.png",
+                  ),
+
+                  const SizedBox(height: 15),
+
+                  _buildInfoBox("Santa Casa da Misericórdia",
+                  "assets/doações/santa_casa.png",
+                  ),
+
+                  const SizedBox(height: 15),
+
+                  _buildInfoBox("Cruz Vermelha Portuguesa",
+                  "assets/doações/cruz.png",
+                  ),
+
+                  const SizedBox(height: 15),
+
+                  _buildInfoBox("Liga dos Bombeiros Portugueses",
+                  "assets/doações/bombeiros.png",
+                  ),
+
+                  const SizedBox(height: 20),
+                ],
+              ),
             ),
           ),
-
-          const SizedBox(height: 20),
-
-          const Text(
-            "Doar",
-            style: TextStyle(
-              fontSize: 20,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-
-          const SizedBox(height: 10),
-
-          const Text(
-            "Cáritas Portugesa",
-            style: TextStyle(
-              fontSize: 14,
-              color: Colors.black,
-            ),
-          ),
-
-          const Text(
-            "Banco Alimentar Contra a Fome",
-            style: TextStyle(
-              fontSize: 14,
-              color: Colors.black,
-            ),
-          ),
-
-          const Text(
-            "Santa Casa da Misericórdia",
-            style: TextStyle(
-              fontSize: 14,
-              color: Colors.black,
-            ),
-          ),
-
-          const Text(
-            "Liga dos Bombeiros Portugueses",
-            style: TextStyle(
-              fontSize: 14,
-              color: Colors.black,
-            ),
-          ),
-
-          const Spacer(),
 
           //Barra de ícones
           Container(
@@ -152,12 +168,16 @@ class DonationPage extends StatelessWidget {
     );
   }
 
-  Widget _buildButton(IconData icon, VoidCallback onTap) {
+Widget _buildButton(IconData icon, VoidCallback onTap) {
     return Expanded(
       child: InkWell(
         onTap: onTap,
         child: Center(
-          child: Icon(icon, color: Colors.white, size: 28),
+          child: Icon(
+            icon,
+            color: Colors.white,
+            size: 28,
+          ),
         ),
       ),
     );
@@ -170,4 +190,51 @@ class DonationPage extends StatelessWidget {
       color: Colors.white30,
     );
   }
+}
+
+// ==========================
+// INFO BOX
+// ==========================
+
+Widget _buildInfoBox(
+  String title,
+  String imagePath,
+) {
+  return Container(
+    width: double.infinity,
+
+    margin: const EdgeInsets.symmetric(
+      horizontal: 20,
+      vertical: 5,
+    ),
+
+    padding: const EdgeInsets.all(16),
+
+    decoration: BoxDecoration(
+      color: const Color.fromRGBO(171, 255, 156, 1),
+      borderRadius: BorderRadius.circular(15),
+    ),
+
+    child: Row(
+      children: [
+
+        // IMAGEM
+        CircleAvatar(
+          radius: 25,
+          backgroundColor: Colors.white,
+          backgroundImage: AssetImage(imagePath),
+        ),
+
+        const SizedBox(width: 15),
+
+        // TEXTO
+        Expanded(
+          child: Text(
+            title,
+            style: AppTextStyles.cardTitle,
+          ),
+        ),
+      ],
+    ),
+  );
 }

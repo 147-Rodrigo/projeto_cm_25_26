@@ -157,19 +157,6 @@ class ForumPage extends StatelessWidget {
                       ),
                     );
                   }),
-
-                  _divider(),
-
-                  // LOGOUT
-                  _buildButton(Icons.logout, () {
-                    Navigator.pushAndRemoveUntil(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => const StartPage(),
-                      ),
-                      (route) => false,
-                    );
-                  }),
                 ],
               ),
             ),

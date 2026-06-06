@@ -158,16 +158,6 @@ class InfoPage extends StatelessWidget {
                   _divider(),
 
                   _buildButton(Icons.info, () {}),
-
-                  _divider(),
-
-                  _buildButton(Icons.logout, () {
-                    Navigator.pushAndRemoveUntil(
-                      context,
-                      MaterialPageRoute(builder: (context) => const StartPage()),
-                      (route) => false,
-                    );
-                  }),
                 ],
               ),
             ),

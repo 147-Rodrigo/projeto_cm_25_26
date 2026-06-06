@@ -146,19 +146,6 @@ class DonationPage extends StatelessWidget {
                       ),
                     );
                   }),
-
-                  _divider(),
-
-                  //Sair - volta ao Inicio da APP
-                  _buildButton(Icons.logout, () {
-                    Navigator.pushAndRemoveUntil(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => const StartPage(),
-                      ),
-                      (route) => false,
-                    );
-                  }),
                 ],
               ),
             ),

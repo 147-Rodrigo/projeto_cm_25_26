@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import 'services/auth_service.dart';
+
 import 'Style/custom_appbar.dart';
 import 'Style/text_styles.dart';
 
@@ -14,27 +16,34 @@ class LoginPage extends StatefulWidget {
   State<LoginPage> createState() => _LoginPageState();
 }
 
+// Formulário e Controladores
 class _LoginPageState extends State<LoginPage> {
-
-  // Chave do formulário
+  // Chave global para validar o formulário inteiro
   final _formKey = GlobalKey<FormState>();
 
-  // Controladores dos campos
+  // Controlador do campo de email
   final _emailController = TextEditingController();
+
+  // Controlador do campo de password
   final _passwordController = TextEditingController();
+
+  // Serviço de autenticação (Firebase)
+  final AuthService _authService = AuthService();
+
+  // Estado de loading (evita múltiplos cliques no botão)
+  bool _loading = false;
 
   @override
   Widget build(BuildContext context) {
-
     return Scaffold(
 
-      // Barra superior
+      // App Bar
       appBar: CustomAppBar(
         title: "Login",
 
+        // Botão de voltar
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
-
           onPressed: () {
             Navigator.pushAndRemoveUntil(
               context,
@@ -47,26 +56,24 @@ class _LoginPageState extends State<LoginPage> {
         ),
       ),
 
-      // Corpo da página
+      // Página
       body: Padding(
         padding: const EdgeInsets.all(16),
 
         child: Form(
           key: _formKey,
 
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
+    child: SingleChildScrollView(
+      child: Column(
+        children: [
 
-            children: [
-
-              // Espaço
+              // Espaçamento superior
               const SizedBox(height: 30),
 
               // Ícone do utilizador
               const CircleAvatar(
                 radius: 55,
                 backgroundColor: Colors.green,
-
                 child: Icon(
                   Icons.person,
                   size: 60,
@@ -79,7 +86,6 @@ class _LoginPageState extends State<LoginPage> {
               // Campo Email
               TextFormField(
                 controller: _emailController,
-
                 keyboardType: TextInputType.emailAddress,
 
                 decoration: const InputDecoration(
@@ -87,12 +93,11 @@ class _LoginPageState extends State<LoginPage> {
                   border: OutlineInputBorder(),
                 ),
 
+                // Validação simples do email
                 validator: (value) {
-
                   if (value == null || value.isEmpty) {
                     return "Insira o email";
                   }
-
                   return null;
                 },
               ),
@@ -102,7 +107,6 @@ class _LoginPageState extends State<LoginPage> {
               // Campo Password
               TextFormField(
                 controller: _passwordController,
-
                 obscureText: true,
 
                 decoration: const InputDecoration(
@@ -110,58 +114,78 @@ class _LoginPageState extends State<LoginPage> {
                   border: OutlineInputBorder(),
                 ),
 
+                // Validação simples da password
                 validator: (value) {
-
                   if (value == null || value.isEmpty) {
                     return "Insira a senha";
                   }
-
                   return null;
                 },
               ),
 
               const SizedBox(height: 24),
 
-              // Botão Entrar
+              // Botão Login
               ElevatedButton(
-
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.green,
                   foregroundColor: Colors.white,
                 ),
 
-                onPressed: () {
+                // Desativa botão enquanto está a carregar
+                onPressed: _loading
+                    ? null
+                    : () async {
+                        // Valida formulário antes de continuar
+                        if (!_formKey.currentState!.validate()) return;
 
-                  // Verifica se os campos estão válidos
-                  if (_formKey.currentState!.validate()) {
+                        setState(() => _loading = true);
 
-                    // Mensagem
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: Text("Login bem-sucedido"),
-                      ),
-                    );
+                        try {
+                          // Tenta fazer login com Firebase
+                          await _authService.login(
+                            email: _emailController.text.trim(),
+                            password: _passwordController.text.trim(),
+                          );
 
-                    // Vai para a Home
-                    Navigator.pushReplacement(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => const HomePage(),
-                      ),
-                    );
-                  }
-                },
+                          // Evita erro se a página já foi fechada
+                          if (!mounted) return;
 
-                child: const Text("Entrar"),
+                          // Mostra mensagem de sucesso
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text("Login bem-sucedido"),
+                            ),
+                          );
+
+                          // Vai para a Home e remove a página de login
+                          Navigator.pushReplacement(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => const HomePage(),
+                            ),
+                          );
+                        } catch (e) {
+                          // Mostra erro no login
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(content: Text("Erro: $e")),
+                          );
+                        }
+
+                        setState(() => _loading = false);
+                      },
+
+                // Texto do botão ou loading
+                child: _loading
+                    ? const CircularProgressIndicator(color: Colors.white)
+                    : const Text("Entrar"),
               ),
 
               const SizedBox(height: 16),
 
-              // Texto para criar conta
+              // Link para Registo
               GestureDetector(
-
                 onTap: () {
-
                   Navigator.push(
                     context,
                     MaterialPageRoute(
@@ -178,6 +202,7 @@ class _LoginPageState extends State<LoginPage> {
             ],
           ),
         ),
+      ),
       ),
     );
   }

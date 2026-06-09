@@ -69,7 +69,7 @@ class EventoDetalhePage extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Imagem de capa (se existir)
+                // Imagem de capa
                 if (imageUrl != null && imageUrl.isNotEmpty)
                   Image.network(
                     imageUrl,

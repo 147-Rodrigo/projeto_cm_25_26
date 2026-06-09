@@ -101,7 +101,7 @@ class _AdicionarNoticiaPageState extends State<AdicionarNoticiaPage> {
           'criadoPor': user?.uid ?? '',
         });
 
-        // Criar notificação apenas ao publicar (não na edição)
+        // Criar notificação apenas ao publicar
         await FirebaseFirestore.instance.collection('notifications').add({
           'titulo': 'Nova notícia publicada',
           'mensagem': _tituloController.text.trim(),

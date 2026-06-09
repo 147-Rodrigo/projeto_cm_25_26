@@ -6,6 +6,7 @@ import 'eventos.dart';
 import 'forum.dart';
 import 'info.dart';
 import 'perfil.dart';
+import 'notificacoes.dart';
 import 'noticias.dart';
 
 class DonationPage extends StatelessWidget {
@@ -25,9 +26,16 @@ class DonationPage extends StatelessWidget {
             ),
           ),
           IconButton(
-            icon: const Icon(Icons.notifications, color: Colors.white),
-            onPressed: () {},
-          ),
+  icon: const Icon(Icons.notifications),
+  onPressed: () {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => const NotificacoesPage(),
+      ),
+    );
+  },
+),
           IconButton(
             icon: const Icon(Icons.person),
             onPressed: () {
@@ -182,9 +190,7 @@ Widget _buildButton(IconData icon, VoidCallback onTap) {
   }
 }
 
-// ==========================
 // INFO BOX
-// ==========================
 
 Widget _buildInfoBox(
   String title,

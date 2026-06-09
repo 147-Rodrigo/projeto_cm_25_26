@@ -1,16 +1,19 @@
-import 'dart:io';
-
 import 'package:flutter/material.dart';
-import 'package:flutter/foundation.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_storage/firebase_storage.dart';
-import 'package:image_picker/image_picker.dart';
 
 import 'Style/custom_appbar.dart';
 
 class AdicionarNoticiaPage extends StatefulWidget {
-  const AdicionarNoticiaPage({super.key});
+  /// Se fornecido, entra em modo de edição.
+  final String? docId;
+  final Map<String, dynamic>? dadosExistentes;
+
+  const AdicionarNoticiaPage({
+    super.key,
+    this.docId,
+    this.dadosExistentes,
+  });
 
   @override
   State<AdicionarNoticiaPage> createState() => _AdicionarNoticiaPageState();
@@ -19,15 +22,17 @@ class AdicionarNoticiaPage extends StatefulWidget {
 class _AdicionarNoticiaPageState extends State<AdicionarNoticiaPage> {
   final _formKey = GlobalKey<FormState>();
 
-  final _tituloController = TextEditingController();
-  final _descricaoController = TextEditingController();
-  final _resumoController = TextEditingController();
-  final _fonteController = TextEditingController();
+  late final TextEditingController _tituloController;
+  late final TextEditingController _descricaoController;
+  late final TextEditingController _resumoController;
+  late final TextEditingController _fonteController;
+  late final TextEditingController _imagemUrlController;
 
-  String _categoriaSelecionada = 'Geral';
+  late String _categoriaSelecionada;
   bool _loading = false;
+  bool _previewErro = false;
 
-  XFile? _imagemSelecionada;
+  bool get _isEdicao => widget.docId != null;
 
   static const _categorias = [
     'Geral',
@@ -39,40 +44,24 @@ class _AdicionarNoticiaPageState extends State<AdicionarNoticiaPage> {
     'Outro',
   ];
 
-  // ─── Selecionar imagem ──────────────────────────────────────────────────────
-  Future<void> _pickImagem() async {
-    final picker = ImagePicker();
-    final picked = await picker.pickImage(
-      source: ImageSource.gallery,
-      imageQuality: 80,
-    );
-    if (picked == null) return;
-    setState(() => _imagemSelecionada = picked);
+  @override
+  void initState() {
+    super.initState();
+    final d = widget.dadosExistentes ?? {};
+    _tituloController =
+        TextEditingController(text: d['titulo'] as String? ?? '');
+    _descricaoController =
+        TextEditingController(text: d['descricao'] as String? ?? '');
+    _resumoController =
+        TextEditingController(text: d['resumo'] as String? ?? '');
+    _fonteController =
+        TextEditingController(text: d['fonte'] as String? ?? '');
+    _imagemUrlController =
+        TextEditingController(text: d['imagemUrl'] as String? ?? '');
+    _categoriaSelecionada = (d['categoria'] as String?) ?? 'Geral';
   }
 
-  // ─── Faz upload para Firebase Storage e retorna a URL ──────────────────────
-  Future<String?> _uploadImagem() async {
-    if (_imagemSelecionada == null) return null;
-
-    final ref = FirebaseStorage.instance
-        .ref()
-        .child('noticias')
-        .child('${DateTime.now().millisecondsSinceEpoch}.jpg');
-
-    UploadTask task;
-
-    if (kIsWeb) {
-      final bytes = await _imagemSelecionada!.readAsBytes();
-      task = ref.putData(bytes, SettableMetadata(contentType: 'image/jpeg'));
-    } else {
-      task = ref.putFile(File(_imagemSelecionada!.path));
-    }
-
-    final snap = await task;
-    return await snap.ref.getDownloadURL();
-  }
-
-  // ─── Submeter notícia ───────────────────────────────────────────────────────
+  // ─── Submeter / Atualizar ───────────────────────────────────────────────────
   Future<void> _submeter() async {
     if (!_formKey.currentState!.validate()) return;
 
@@ -81,36 +70,55 @@ class _AdicionarNoticiaPageState extends State<AdicionarNoticiaPage> {
     try {
       final user = FirebaseAuth.instance.currentUser;
 
-      // Faz upload da imagem (se existir) e obtém URL
-      final imagemUrl = await _uploadImagem();
-
-      await FirebaseFirestore.instance.collection('noticias').add({
+      final payload = {
         'titulo': _tituloController.text.trim(),
         'descricao': _descricaoController.text.trim(),
         'resumo': _resumoController.text.trim(),
         'fonte': _fonteController.text.trim().isNotEmpty
             ? _fonteController.text.trim()
             : (user?.email ?? 'EcoLoop'),
-        'imagemUrl': imagemUrl ?? '',
+        'imagemUrl': _imagemUrlController.text.trim(),
         'categoria': _categoriaSelecionada,
-        'dataPublicacao': FieldValue.serverTimestamp(),
-        'criadoPor': user?.uid ?? '',
-      });
+      };
 
-      // Notificação global na coleção 'notificacoes'
-      await FirebaseFirestore.instance.collection('notificacoes').add({
-        'titulo': '📰 Nova Notícia: ${_tituloController.text.trim()}',
-        'corpo':
-            '$_categoriaSelecionada · ${_fonteController.text.trim().isNotEmpty ? _fonteController.text.trim() : 'EcoLoop'}',
-        'dataHora': FieldValue.serverTimestamp(),
-        'lida': false,
-        'tipo': 'noticia',
-      });
+      if (_isEdicao) {
+        // Atualiza documento existente
+        await FirebaseFirestore.instance
+            .collection('noticias')
+            .doc(widget.docId)
+            .update({
+          ...payload,
+          'editadoEm': FieldValue.serverTimestamp(),
+          'editadoPor': user?.uid ?? '',
+        });
+      } else {
+        // Cria novo documento e guarda a referência para a notificação
+        final noticiaRef = await FirebaseFirestore.instance
+            .collection('noticias')
+            .add({
+          ...payload,
+          'dataPublicacao': FieldValue.serverTimestamp(),
+          'criadoPor': user?.uid ?? '',
+        });
+
+        // Criar notificação apenas ao publicar (não na edição)
+        await FirebaseFirestore.instance.collection('notifications').add({
+          'titulo': 'Nova notícia publicada',
+          'mensagem': _tituloController.text.trim(),
+          'data': FieldValue.serverTimestamp(),
+          'noticiaId': noticiaRef.id,
+          'tipo': 'noticia',
+        });
+      }
 
       if (!mounted) return;
 
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Notícia adicionada com sucesso!")),
+        SnackBar(
+          content: Text(_isEdicao
+              ? "Notícia atualizada com sucesso!"
+              : "Notícia adicionada com sucesso!"),
+        ),
       );
 
       Navigator.pop(context);
@@ -118,9 +126,9 @@ class _AdicionarNoticiaPageState extends State<AdicionarNoticiaPage> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text("Erro: $e")),
       );
+    } finally {
+      if (mounted) setState(() => _loading = false);
     }
-
-    setState(() => _loading = false);
   }
 
   @override
@@ -129,20 +137,22 @@ class _AdicionarNoticiaPageState extends State<AdicionarNoticiaPage> {
     _descricaoController.dispose();
     _resumoController.dispose();
     _fonteController.dispose();
+    _imagemUrlController.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
+    final urlImagem = _imagemUrlController.text.trim();
+
     return Scaffold(
       appBar: CustomAppBar(
-        title: "Adicionar Notícia",
+        title: _isEdicao ? "Editar Notícia" : "Adicionar Notícia",
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           onPressed: () => Navigator.pop(context),
         ),
       ),
-
       body: Padding(
         padding: const EdgeInsets.all(16),
         child: Form(
@@ -152,7 +162,7 @@ class _AdicionarNoticiaPageState extends State<AdicionarNoticiaPage> {
               children: [
                 const SizedBox(height: 16),
 
-                // ─── Título ────────────────────────────────────────────────
+                // Título
                 TextFormField(
                   controller: _tituloController,
                   decoration: const InputDecoration(
@@ -163,23 +173,25 @@ class _AdicionarNoticiaPageState extends State<AdicionarNoticiaPage> {
                   validator: (v) =>
                       v == null || v.isEmpty ? "Insira o título" : null,
                 ),
+
                 const SizedBox(height: 14),
 
-                // ─── Descrição ────────────────────────────────────────────
+                // Descrição
                 TextFormField(
                   controller: _descricaoController,
                   maxLines: 2,
                   decoration: const InputDecoration(
-                    labelText: "Descrição * (aparece na lista)",
+                    labelText: "Descrição *",
                     border: OutlineInputBorder(),
                     prefixIcon: Icon(Icons.short_text),
                   ),
                   validator: (v) =>
                       v == null || v.isEmpty ? "Insira a descrição" : null,
                 ),
+
                 const SizedBox(height: 14),
 
-                // ─── Artigo ───────────────────────────────────────────────
+                // Artigo
                 TextFormField(
                   controller: _resumoController,
                   maxLines: 8,
@@ -192,9 +204,10 @@ class _AdicionarNoticiaPageState extends State<AdicionarNoticiaPage> {
                   validator: (v) =>
                       v == null || v.isEmpty ? "Insira o artigo" : null,
                 ),
+
                 const SizedBox(height: 14),
 
-                // ─── Fonte ────────────────────────────────────────────────
+                // Fonte
                 TextFormField(
                   controller: _fonteController,
                   decoration: const InputDecoration(
@@ -203,9 +216,10 @@ class _AdicionarNoticiaPageState extends State<AdicionarNoticiaPage> {
                     prefixIcon: Icon(Icons.source),
                   ),
                 ),
+
                 const SizedBox(height: 14),
 
-                // ─── Categoria ────────────────────────────────────────────
+                // Categoria
                 DropdownButtonFormField<String>(
                   value: _categoriaSelecionada,
                   decoration: const InputDecoration(
@@ -214,70 +228,63 @@ class _AdicionarNoticiaPageState extends State<AdicionarNoticiaPage> {
                     prefixIcon: Icon(Icons.category),
                   ),
                   items: _categorias
-                      .map((c) =>
-                          DropdownMenuItem(value: c, child: Text(c)))
+                      .map((c) => DropdownMenuItem(value: c, child: Text(c)))
                       .toList(),
                   onChanged: (v) =>
                       setState(() => _categoriaSelecionada = v!),
                 ),
+
                 const SizedBox(height: 14),
 
-                // ─── Imagem ───────────────────────────────────────────────
-                GestureDetector(
-                  onTap: _pickImagem,
-                  child: Container(
-                    width: double.infinity,
-                    height: 160,
-                    decoration: BoxDecoration(
-                      color: Colors.green.shade50,
-                      borderRadius: BorderRadius.circular(10),
-                      border: Border.all(color: Colors.green, width: 1.5),
-                    ),
-                    child: _imagemSelecionada == null
-                        ? const Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Icon(Icons.add_photo_alternate,
-                                  size: 48, color: Colors.green),
-                              SizedBox(height: 8),
-                              Text(
-                                "Toque para adicionar imagem\n(opcional)",
-                                textAlign: TextAlign.center,
-                                style: TextStyle(color: Colors.green),
-                              ),
-                            ],
-                          )
-                        : ClipRRect(
-                            borderRadius: BorderRadius.circular(10),
-                            child: kIsWeb
-                                ? Image.network(
-                                    _imagemSelecionada!.path,
-                                    fit: BoxFit.cover,
-                                    width: double.infinity,
-                                    height: 160,
-                                  )
-                                : Image.file(
-                                    File(_imagemSelecionada!.path),
-                                    fit: BoxFit.cover,
-                                    width: double.infinity,
-                                    height: 160,
-                                  ),
-                          ),
+                // URL da Imagem
+                TextFormField(
+                  controller: _imagemUrlController,
+                  decoration: const InputDecoration(
+                    labelText: "URL da Imagem (opcional)",
+                    border: OutlineInputBorder(),
+                    prefixIcon: Icon(Icons.image),
                   ),
+                  onChanged: (_) => setState(() => _previewErro = false),
                 ),
 
-                if (_imagemSelecionada != null)
-                  TextButton.icon(
-                    onPressed: () =>
-                        setState(() => _imagemSelecionada = null),
-                    icon: const Icon(Icons.delete, color: Colors.red),
-                    label: const Text("Remover imagem",
-                        style: TextStyle(color: Colors.red)),
+                const SizedBox(height: 10),
+
+                // Preview da imagem
+                if (urlImagem.isNotEmpty)
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(10),
+                    child: _previewErro
+                        ? Container(
+                            height: 50,
+                            width: double.infinity,
+                            decoration: BoxDecoration(
+                              color: Colors.red.shade50,
+                              border: Border.all(color: Colors.red),
+                            ),
+                            child: const Center(
+                              child: Text(
+                                "URL inválido — imagem não carregada",
+                                style: TextStyle(color: Colors.red),
+                              ),
+                            ),
+                          )
+                        : Image.network(
+                            urlImagem,
+                            height: 160,
+                            width: double.infinity,
+                            fit: BoxFit.cover,
+                            errorBuilder: (_, __, ___) {
+                              WidgetsBinding.instance.addPostFrameCallback(
+                                (_) => setState(() => _previewErro = true),
+                              );
+                              return const SizedBox.shrink();
+                            },
+                          ),
                   ),
 
                 const SizedBox(height: 28),
 
-                // ─── Botão Submeter ───────────────────────────────────────
+                // Botão submeter
                 SizedBox(
                   width: double.infinity,
                   child: ElevatedButton(
@@ -292,8 +299,10 @@ class _AdicionarNoticiaPageState extends State<AdicionarNoticiaPage> {
                     onPressed: _loading ? null : _submeter,
                     child: _loading
                         ? const CircularProgressIndicator(color: Colors.white)
-                        : const Text("Publicar Notícia",
-                            style: TextStyle(fontSize: 16)),
+                        : Text(
+                            _isEdicao ? "Guardar Alterações" : "Publicar Notícia",
+                            style: const TextStyle(fontSize: 16),
+                          ),
                   ),
                 ),
 

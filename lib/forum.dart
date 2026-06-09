@@ -7,6 +7,7 @@ import 'donation.dart';
 import 'info.dart';
 import 'perfil.dart';
 import 'noticias.dart';
+import 'notificacoes.dart';
 
 class ForumPage extends StatelessWidget {
   const ForumPage({super.key});
@@ -25,9 +26,16 @@ class ForumPage extends StatelessWidget {
             ),
           ),
           IconButton(
-            icon: const Icon(Icons.notifications, color: Colors.white),
-            onPressed: () {},
-          ),
+  icon: const Icon(Icons.notifications),
+  onPressed: () {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => const NotificacoesPage(),
+      ),
+    );
+  },
+),
           IconButton(
             icon: const Icon(Icons.person),
             onPressed: () {
@@ -193,10 +201,7 @@ class ForumPage extends StatelessWidget {
   }
 }
 
-// ==========================
 // INFO BOX
-// ==========================
-
 Widget _buildInfoBox(
   String username,
   String date,

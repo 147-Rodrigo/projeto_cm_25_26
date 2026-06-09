@@ -12,9 +12,59 @@ import 'info.dart';
 import 'perfil.dart';
 import 'adicionar_noticia.dart';
 import 'noticia_detalhe.dart';
+import 'notificacoes.dart';
+import 'services/admin_service.dart';
 
-class NoticiasPage extends StatelessWidget {
+class NoticiasPage extends StatefulWidget {
   const NoticiasPage({super.key});
+
+  @override
+  State<NoticiasPage> createState() => _NoticiasPageState();
+}
+
+class _NoticiasPageState extends State<NoticiasPage> {
+  bool _isAdmin = false;
+
+  @override
+  void initState() {
+    super.initState();
+    AdminService.isAdmin().then((v) => setState(() => _isAdmin = v));
+  }
+
+  // ─── Apagar notícia (admin) ─────────────────────────────────────────────────
+  Future<void> _apagarNoticia(String docId) async {
+    final confirmar = await showDialog<bool>(
+      context: context,
+      builder: (_) => AlertDialog(
+        title: const Text("Apagar notícia?"),
+        content: const Text("Esta ação é irreversível."),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: const Text("Cancelar"),
+          ),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
+            onPressed: () => Navigator.pop(context, true),
+            child: const Text("Apagar",
+                style: TextStyle(color: Colors.white)),
+          ),
+        ],
+      ),
+    );
+
+    if (confirmar != true) return;
+
+    await FirebaseFirestore.instance
+        .collection('noticias')
+        .doc(docId)
+        .delete();
+
+    if (!mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text("Notícia apagada.")),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -22,30 +72,43 @@ class NoticiasPage extends StatelessWidget {
       appBar: CustomAppBar(
         title: "Notícias",
         actions: [
+          if (_isAdmin)
+            const Tooltip(
+              message: "Modo Admin",
+              child: Padding(
+                padding: EdgeInsets.symmetric(horizontal: 4),
+                child: Icon(Icons.admin_panel_settings,
+                    color: Colors.amber, size: 22),
+              ),
+            ),
           IconButton(
-            icon: const Icon(Icons.notifications, color: Colors.white),
-            onPressed: () {},
+            icon: const Icon(Icons.notifications),
+            onPressed: () => Navigator.push(
+              context,
+              MaterialPageRoute(builder: (_) => const NotificacoesPage()),
+            ),
           ),
           IconButton(
             icon: const Icon(Icons.person),
-            onPressed: () => Navigator.push(
-              context,
-              MaterialPageRoute(builder: (_) => const PerfilPage()),
-            ),
+            onPressed: () => Navigator.push(context,
+                MaterialPageRoute(builder: (_) => const PerfilPage())),
           ),
         ],
       ),
 
-      // ─── FAB para adicionar notícia ─────────────────────────────────────────
-      floatingActionButton: FloatingActionButton(
-        backgroundColor: Colors.green,
-        onPressed: () => Navigator.push(
-          context,
-          MaterialPageRoute(builder: (_) => const AdicionarNoticiaPage()),
-        ),
-        tooltip: "Adicionar Notícia",
-        child: const Icon(Icons.add, color: Colors.white),
-      ),
+      // FAB — só visível para admin
+      floatingActionButton: _isAdmin
+          ? FloatingActionButton(
+              backgroundColor: Colors.green,
+              onPressed: () => Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (_) => const AdicionarNoticiaPage()),
+              ),
+              tooltip: "Adicionar Notícia",
+              child: const Icon(Icons.add, color: Colors.white),
+            )
+          : null,
 
       body: Column(
         children: [
@@ -63,7 +126,7 @@ class NoticiasPage extends StatelessWidget {
                 if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
                   return const Center(
                     child: Text(
-                      "Sem notícias de momento.\nCarregue em + para adicionar.",
+                      "Sem notícias de momento.",
                       textAlign: TextAlign.center,
                       style: TextStyle(fontSize: 16, color: Colors.grey),
                     ),
@@ -78,8 +141,14 @@ class NoticiasPage extends StatelessWidget {
                   itemCount: docs.length,
                   separatorBuilder: (_, __) => const SizedBox(height: 12),
                   itemBuilder: (context, i) {
-                    final data = docs[i].data() as Map<String, dynamic>;
-                    return _NoticiaCard(docId: docs[i].id, data: data);
+                    final data =
+                        docs[i].data() as Map<String, dynamic>;
+                    return _NoticiaCard(
+                      docId: docs[i].id,
+                      data: data,
+                      isAdmin: _isAdmin,
+                      onDelete: () => _apagarNoticia(docs[i].id),
+                    );
                   },
                 );
               },
@@ -96,7 +165,15 @@ class NoticiasPage extends StatelessWidget {
 class _NoticiaCard extends StatelessWidget {
   final String docId;
   final Map<String, dynamic> data;
-  const _NoticiaCard({required this.docId, required this.data});
+  final bool isAdmin;
+  final VoidCallback onDelete;
+
+  const _NoticiaCard({
+    required this.docId,
+    required this.data,
+    required this.isAdmin,
+    required this.onDelete,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -118,7 +195,7 @@ class _NoticiaCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Imagem (se existir)
+          // Imagem
           if (imageUrl != null && imageUrl.isNotEmpty)
             Image.network(
               imageUrl,
@@ -133,29 +210,60 @@ class _NoticiaCard extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Categoria badge
-                Container(
-                  padding: const EdgeInsets.symmetric(
-                      horizontal: 10, vertical: 3),
-                  decoration: BoxDecoration(
-                    color: Colors.green,
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                  child: Text(
-                    categoria,
-                    style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 11,
-                        fontWeight: FontWeight.bold),
-                  ),
+                // Categoria + botões admin
+                Row(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 10, vertical: 3),
+                      decoration: BoxDecoration(
+                        color: Colors.green,
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      child: Text(
+                        categoria,
+                        style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 11,
+                            fontWeight: FontWeight.bold),
+                      ),
+                    ),
+                    const Spacer(),
+                    // Ações admin
+                    if (isAdmin) ...[
+                      IconButton(
+                        icon: const Icon(Icons.edit,
+                            color: Colors.green, size: 20),
+                        tooltip: "Editar",
+                        padding: EdgeInsets.zero,
+                        constraints: const BoxConstraints(),
+                        onPressed: () => Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => AdicionarNoticiaPage(
+                              docId: docId,
+                              dadosExistentes: data,
+                            ),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      IconButton(
+                        icon: const Icon(Icons.delete_outline,
+                            color: Colors.red, size: 20),
+                        tooltip: "Apagar",
+                        padding: EdgeInsets.zero,
+                        constraints: const BoxConstraints(),
+                        onPressed: onDelete,
+                      ),
+                    ],
+                  ],
                 ),
                 const SizedBox(height: 8),
 
-                // Título
                 Text(titulo, style: AppTextStyles.forumUsername),
                 const SizedBox(height: 6),
 
-                // Descrição (máx 3 linhas no card)
                 Text(
                   descricao,
                   style: AppTextStyles.forumText,
@@ -164,7 +272,6 @@ class _NoticiaCard extends StatelessWidget {
                 ),
                 const SizedBox(height: 10),
 
-                // Fonte + Data
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
@@ -176,7 +283,6 @@ class _NoticiaCard extends StatelessWidget {
 
                 const SizedBox(height: 10),
 
-                // Botão Ler mais
                 Align(
                   alignment: Alignment.centerRight,
                   child: ElevatedButton.icon(
@@ -199,10 +305,8 @@ class _NoticiaCard extends StatelessWidget {
                       ),
                     ),
                     icon: const Icon(Icons.article_outlined, size: 16),
-                    label: const Text(
-                      "Ler mais",
-                      style: TextStyle(fontWeight: FontWeight.bold),
-                    ),
+                    label: const Text("Ler mais",
+                        style: TextStyle(fontWeight: FontWeight.bold)),
                   ),
                 ),
               ],

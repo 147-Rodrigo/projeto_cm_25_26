@@ -160,7 +160,7 @@ class _MapsState extends State<Maps> {
             onLongPress: _setOrigin,
           ),
 
-          // 🟥 Limpar rota
+          // Limpar rota
           Positioned(
             bottom: 90,
             right: 20,
@@ -171,7 +171,7 @@ class _MapsState extends State<Maps> {
             ),
           ),
 
-          // 🎯 Fit rota
+          // Fit rota
           Positioned(
             bottom: 20,
             right: 20,
@@ -183,7 +183,7 @@ class _MapsState extends State<Maps> {
             ),
           ),
 
-          // 📊 INFO BOX (estilo centralizado)
+          // Info Box
           if (_info != null)
             Positioned(
               top: 20,
@@ -197,7 +197,7 @@ class _MapsState extends State<Maps> {
               ),
             ),
 
-          // 🟢🔵 BOTÕES ORIGEM / DESTINO
+          // Botões Origemm / Destino
           if (_origin != null || _destination != null)
             Positioned(
               top: 20,

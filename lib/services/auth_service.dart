@@ -13,6 +13,7 @@ class AuthService {
     required String password,
     required String dataNascimento,
     required String localizacao,
+    String role = 'utilizador',
   }) async {
     
     // validação da senha antes do Firebase
@@ -21,19 +22,20 @@ class AuthService {
     }
 
     try {
-      // 1. criar conta
+      // criar conta
       final userCredential =
           await _auth.createUserWithEmailAndPassword(
         email: email,
         password: password,
       );
 
-      // 2. guardar no Firestore
+      // guardar no Firestore
       await _db.collection("users").doc(userCredential.user!.uid).set({
         "nome": name,
         "email": email,
         "dataNascimento": dataNascimento,
         "localizacao": localizacao,
+        "role": role,
       });
     } on FirebaseAuthException catch (e) {
       if (e.code == 'email-already-in-use') {

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'services/notification_service.dart';
 
 import 'Style/custom_appbar.dart';
 
@@ -33,7 +34,6 @@ class _AdicionarEventoPageState extends State<AdicionarEventoPage> {
     'Outro',
   ];
 
-  // ─── Selecionar data ────────────────────────────────────────────────────────
   Future<void> _pickData() async {
     final picked = await showDatePicker(
       context: context,
@@ -44,7 +44,6 @@ class _AdicionarEventoPageState extends State<AdicionarEventoPage> {
     if (picked != null) setState(() => _dataSelecionada = picked);
   }
 
-  // ─── Selecionar hora ────────────────────────────────────────────────────────
   Future<void> _pickHora() async {
     final picked = await showTimePicker(
       context: context,
@@ -53,9 +52,9 @@ class _AdicionarEventoPageState extends State<AdicionarEventoPage> {
     if (picked != null) setState(() => _horaSelecionada = picked);
   }
 
-  // ─── Submeter evento ────────────────────────────────────────────────────────
   Future<void> _submeter() async {
     if (!_formKey.currentState!.validate()) return;
+
     if (_dataSelecionada == null) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text("Selecione a data do evento")),
@@ -68,8 +67,8 @@ class _AdicionarEventoPageState extends State<AdicionarEventoPage> {
     try {
       final user = FirebaseAuth.instance.currentUser;
 
-      // Combina data + hora
       final hora = _horaSelecionada ?? const TimeOfDay(hour: 9, minute: 0);
+
       final dataCompleta = DateTime(
         _dataSelecionada!.year,
         _dataSelecionada!.month,
@@ -78,7 +77,7 @@ class _AdicionarEventoPageState extends State<AdicionarEventoPage> {
         hora.minute,
       );
 
-      // Guarda no Firestore
+      // Guardar evento
       await FirebaseFirestore.instance.collection('eventos').add({
         'titulo': _tituloController.text.trim(),
         'descricao': _descricaoController.text.trim(),
@@ -93,29 +92,41 @@ class _AdicionarEventoPageState extends State<AdicionarEventoPage> {
         'criadoEm': FieldValue.serverTimestamp(),
       });
 
-      // Adiciona notificação global na coleção 'notificacoes'
-      await FirebaseFirestore.instance.collection('notificacoes').add({
-        'titulo': '📅 Novo Evento: ${_tituloController.text.trim()}',
-        'corpo': '$_categoriaSelecionada · ${_localController.text.trim()}',
-        'dataHora': FieldValue.serverTimestamp(),
-        'lida': false,
-        'tipo': 'evento',
-      });
+      // Criar notificação
+      await NotificationService.instance.addNotification(
+  titulo: '📅 Novo Evento: ${_tituloController.text.trim()}',
+  mensagem: '${_categoriaSelecionada} · ${_localController.text.trim()}',
+);
 
+if (!mounted) return;
+
+// feedback
+ScaffoldMessenger.of(context).showSnackBar(
+  SnackBar(
+    content: Text(
+      '📅 ${_tituloController.text.trim()} criado com sucesso!',
+    ),
+    backgroundColor: Colors.green,
+    behavior: SnackBarBehavior.floating,
+  ),
+);
+
+// espera curta para garantir UI
+await Future.delayed(const Duration(milliseconds: 400));
+
+if (!mounted) return;
+Navigator.pop(context);
+    } catch (e) {
       if (!mounted) return;
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Evento adicionado com sucesso!")),
-      );
-
-      Navigator.pop(context); // Volta à página de Eventos
-    } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text("Erro: $e")),
       );
     }
 
-    setState(() => _loading = false);
+    if (mounted) {
+      setState(() => _loading = false);
+    }
   }
 
   @override
@@ -138,7 +149,6 @@ class _AdicionarEventoPageState extends State<AdicionarEventoPage> {
           onPressed: () => Navigator.pop(context),
         ),
       ),
-
       body: Padding(
         padding: const EdgeInsets.all(16),
         child: Form(
@@ -148,7 +158,6 @@ class _AdicionarEventoPageState extends State<AdicionarEventoPage> {
               children: [
                 const SizedBox(height: 16),
 
-                // ─── Título ────────────────────────────────────────────────
                 TextFormField(
                   controller: _tituloController,
                   decoration: const InputDecoration(
@@ -161,7 +170,6 @@ class _AdicionarEventoPageState extends State<AdicionarEventoPage> {
                 ),
                 const SizedBox(height: 14),
 
-                // ─── Descrição ────────────────────────────────────────────
                 TextFormField(
                   controller: _descricaoController,
                   maxLines: 3,
@@ -175,7 +183,6 @@ class _AdicionarEventoPageState extends State<AdicionarEventoPage> {
                 ),
                 const SizedBox(height: 14),
 
-                // ─── Local ────────────────────────────────────────────────
                 TextFormField(
                   controller: _localController,
                   decoration: const InputDecoration(
@@ -188,7 +195,6 @@ class _AdicionarEventoPageState extends State<AdicionarEventoPage> {
                 ),
                 const SizedBox(height: 14),
 
-                // ─── Organizador ──────────────────────────────────────────
                 TextFormField(
                   controller: _organizadorController,
                   decoration: const InputDecoration(
@@ -199,7 +205,6 @@ class _AdicionarEventoPageState extends State<AdicionarEventoPage> {
                 ),
                 const SizedBox(height: 14),
 
-                // ─── URL Imagem ───────────────────────────────────────────
                 TextFormField(
                   controller: _imagemController,
                   decoration: const InputDecoration(
@@ -210,9 +215,8 @@ class _AdicionarEventoPageState extends State<AdicionarEventoPage> {
                 ),
                 const SizedBox(height: 14),
 
-                // ─── Categoria ────────────────────────────────────────────
                 DropdownButtonFormField<String>(
-                  initialValue: _categoriaSelecionada,
+                  value: _categoriaSelecionada,
                   decoration: const InputDecoration(
                     labelText: "Categoria",
                     border: OutlineInputBorder(),
@@ -227,7 +231,6 @@ class _AdicionarEventoPageState extends State<AdicionarEventoPage> {
                 ),
                 const SizedBox(height: 14),
 
-                // ─── Data ─────────────────────────────────────────────────
                 Row(
                   children: [
                     Expanded(
@@ -241,11 +244,6 @@ class _AdicionarEventoPageState extends State<AdicionarEventoPage> {
                               : '${_dataSelecionada!.day.toString().padLeft(2, '0')}/'
                                   '${_dataSelecionada!.month.toString().padLeft(2, '0')}/'
                                   '${_dataSelecionada!.year}',
-                          style: TextStyle(
-                            color: _dataSelecionada == null
-                                ? Colors.grey
-                                : Colors.black,
-                          ),
                         ),
                       ),
                     ),
@@ -259,11 +257,6 @@ class _AdicionarEventoPageState extends State<AdicionarEventoPage> {
                           _horaSelecionada == null
                               ? "Hora (opcional)"
                               : _horaSelecionada!.format(context),
-                          style: TextStyle(
-                            color: _horaSelecionada == null
-                                ? Colors.grey
-                                : Colors.black,
-                          ),
                         ),
                       ),
                     ),
@@ -272,7 +265,6 @@ class _AdicionarEventoPageState extends State<AdicionarEventoPage> {
 
                 const SizedBox(height: 28),
 
-                // ─── Botão Submeter ───────────────────────────────────────
                 SizedBox(
                   width: double.infinity,
                   child: ElevatedButton(

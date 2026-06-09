@@ -34,7 +34,6 @@ class _AdicionarNoticiaPageState extends State<AdicionarNoticiaPage> {
     'Outro',
   ];
 
-  // ─── Submeter notícia ───────────────────────────────────────────────────────
   Future<void> _submeter() async {
     if (!_formKey.currentState!.validate()) return;
 
@@ -43,7 +42,10 @@ class _AdicionarNoticiaPageState extends State<AdicionarNoticiaPage> {
     try {
       final user = FirebaseAuth.instance.currentUser;
 
-      await FirebaseFirestore.instance.collection('noticias').add({
+      // Criar notícia
+      final noticiaRef = await FirebaseFirestore.instance
+          .collection('noticias')
+          .add({
         'titulo': _tituloController.text.trim(),
         'descricao': _descricaoController.text.trim(),
         'resumo': _resumoController.text.trim(),
@@ -54,6 +56,15 @@ class _AdicionarNoticiaPageState extends State<AdicionarNoticiaPage> {
         'categoria': _categoriaSelecionada,
         'dataPublicacao': FieldValue.serverTimestamp(),
         'criadoPor': user?.uid ?? '',
+      });
+
+      // Criar notificação
+      await FirebaseFirestore.instance.collection('notifications').add({
+        'titulo': 'Nova notícia publicada',
+        'mensagem': _tituloController.text.trim(),
+        'data': FieldValue.serverTimestamp(),
+        'noticiaId': noticiaRef.id,
+        'tipo': 'noticia',
       });
 
       if (!mounted) return;
@@ -67,9 +78,9 @@ class _AdicionarNoticiaPageState extends State<AdicionarNoticiaPage> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text("Erro: $e")),
       );
+    } finally {
+      setState(() => _loading = false);
     }
-
-    setState(() => _loading = false);
   }
 
   @override
@@ -94,7 +105,6 @@ class _AdicionarNoticiaPageState extends State<AdicionarNoticiaPage> {
           onPressed: () => Navigator.pop(context),
         ),
       ),
-
       body: Padding(
         padding: const EdgeInsets.all(16),
         child: Form(
@@ -104,7 +114,6 @@ class _AdicionarNoticiaPageState extends State<AdicionarNoticiaPage> {
               children: [
                 const SizedBox(height: 16),
 
-                // ─── Título ────────────────────────────────────────────────
                 TextFormField(
                   controller: _tituloController,
                   decoration: const InputDecoration(
@@ -115,28 +124,28 @@ class _AdicionarNoticiaPageState extends State<AdicionarNoticiaPage> {
                   validator: (v) =>
                       v == null || v.isEmpty ? "Insira o título" : null,
                 ),
+
                 const SizedBox(height: 14),
 
-                // ─── Descrição ────────────────────────────────────────────
                 TextFormField(
                   controller: _descricaoController,
                   maxLines: 2,
                   decoration: const InputDecoration(
-                    labelText: "Descrição * (aparece na lista)",
+                    labelText: "Descrição *",
                     border: OutlineInputBorder(),
                     prefixIcon: Icon(Icons.short_text),
                   ),
                   validator: (v) =>
                       v == null || v.isEmpty ? "Insira a descrição" : null,
                 ),
+
                 const SizedBox(height: 14),
 
-                // ─── Artigo ───────────────────────────────────────────────
                 TextFormField(
                   controller: _resumoController,
                   maxLines: 8,
                   decoration: const InputDecoration(
-                    labelText: "Artigo * (texto completo ao clicar em Ler mais)",
+                    labelText: "Artigo *",
                     border: OutlineInputBorder(),
                     prefixIcon: Icon(Icons.description),
                     alignLabelWithHint: true,
@@ -144,9 +153,9 @@ class _AdicionarNoticiaPageState extends State<AdicionarNoticiaPage> {
                   validator: (v) =>
                       v == null || v.isEmpty ? "Insira o artigo" : null,
                 ),
+
                 const SizedBox(height: 14),
 
-                // ─── Fonte ────────────────────────────────────────────────
                 TextFormField(
                   controller: _fonteController,
                   decoration: const InputDecoration(
@@ -155,9 +164,9 @@ class _AdicionarNoticiaPageState extends State<AdicionarNoticiaPage> {
                     prefixIcon: Icon(Icons.source),
                   ),
                 ),
+
                 const SizedBox(height: 14),
 
-                // ─── Categoria ────────────────────────────────────────────
                 DropdownButtonFormField<String>(
                   value: _categoriaSelecionada,
                   decoration: const InputDecoration(
@@ -166,36 +175,38 @@ class _AdicionarNoticiaPageState extends State<AdicionarNoticiaPage> {
                     prefixIcon: Icon(Icons.category),
                   ),
                   items: _categorias
-                      .map((c) => DropdownMenuItem(value: c, child: Text(c)))
+                      .map((c) => DropdownMenuItem(
+                            value: c,
+                            child: Text(c),
+                          ))
                       .toList(),
-                  onChanged: (v) => setState(() => _categoriaSelecionada = v!),
+                  onChanged: (v) =>
+                      setState(() => _categoriaSelecionada = v!),
                 ),
+
                 const SizedBox(height: 14),
 
-                // ─── URL da Imagem ────────────────────────────────────────
                 TextFormField(
                   controller: _imagemUrlController,
                   decoration: const InputDecoration(
                     labelText: "URL da Imagem (opcional)",
-                    hintText: "https://exemplo.com/imagem.jpg",
                     border: OutlineInputBorder(),
                     prefixIcon: Icon(Icons.image),
                   ),
                   onChanged: (_) => setState(() => _previewErro = false),
                 ),
+
                 const SizedBox(height: 10),
 
-                // ─── Preview da imagem ────────────────────────────────────
                 if (urlImagem.isNotEmpty)
                   ClipRRect(
                     borderRadius: BorderRadius.circular(10),
                     child: _previewErro
                         ? Container(
-                            width: double.infinity,
                             height: 50,
+                            width: double.infinity,
                             decoration: BoxDecoration(
                               color: Colors.red.shade50,
-                              borderRadius: BorderRadius.circular(10),
                               border: Border.all(color: Colors.red),
                             ),
                             child: const Center(
@@ -212,7 +223,8 @@ class _AdicionarNoticiaPageState extends State<AdicionarNoticiaPage> {
                             fit: BoxFit.cover,
                             errorBuilder: (_, __, ___) {
                               WidgetsBinding.instance.addPostFrameCallback(
-                                  (_) => setState(() => _previewErro = true));
+                                (_) => setState(() => _previewErro = true),
+                              );
                               return const SizedBox.shrink();
                             },
                           ),
@@ -220,7 +232,6 @@ class _AdicionarNoticiaPageState extends State<AdicionarNoticiaPage> {
 
                 const SizedBox(height: 28),
 
-                // ─── Botão Submeter ───────────────────────────────────────
                 SizedBox(
                   width: double.infinity,
                   child: ElevatedButton(
@@ -235,8 +246,10 @@ class _AdicionarNoticiaPageState extends State<AdicionarNoticiaPage> {
                     onPressed: _loading ? null : _submeter,
                     child: _loading
                         ? const CircularProgressIndicator(color: Colors.white)
-                        : const Text("Publicar Notícia",
-                            style: TextStyle(fontSize: 16)),
+                        : const Text(
+                            "Publicar Notícia",
+                            style: TextStyle(fontSize: 16),
+                          ),
                   ),
                 ),
 

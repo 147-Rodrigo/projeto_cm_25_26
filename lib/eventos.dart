@@ -160,9 +160,6 @@ class EventosPage extends StatelessWidget {
       Container(width: 1, height: 30, color: Colors.white30);
 }
 
-// ==========================
-// CARD DE EVENTO
-// ==========================
 
 class _EventoCard extends StatelessWidget {
   final String eventoId;

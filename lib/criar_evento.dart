@@ -363,7 +363,7 @@ class _CriarEventoPageState extends State<CriarEventoPage> {
 
                 const SizedBox(height: 14),
 
-                // Hora início e fim
+                // Hora início e fim 
                 Row(
                   children: [
                     _horaPicker("Início", _horaInicio, true),

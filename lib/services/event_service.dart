@@ -40,7 +40,7 @@ class EventService {
     });
   }
 
-  // Editar evento (só o autor)
+  // Editar evento
   Future<void> editarEvento({
     required String eventoId,
     required String titulo,
@@ -100,7 +100,6 @@ class EventService {
         .snapshots();
   }
 
-  // Apagar evento (só o autor)
   Future<void> apagarEvento(String eventoId) async {
     final user = _auth.currentUser;
     if (user == null) throw Exception("Utilizador não autenticado");

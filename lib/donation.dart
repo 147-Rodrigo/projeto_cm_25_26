@@ -6,7 +6,7 @@ import 'eventos.dart';
 import 'forum.dart';
 import 'info.dart';
 import 'perfil.dart';
-import 'main.dart';
+import 'noticias.dart';
 
 class DonationPage extends StatelessWidget {
   const DonationPage({super.key});
@@ -19,10 +19,13 @@ class DonationPage extends StatelessWidget {
         actions: [
           IconButton(
             icon: const Icon(Icons.newspaper),
-            onPressed: () {},
+            onPressed: () => Navigator.push(
+              context,
+              MaterialPageRoute(builder: (_) => const NoticiasPage()),
+            ),
           ),
           IconButton(
-            icon: const Icon(Icons.notifications),
+            icon: const Icon(Icons.notifications, color: Colors.white),
             onPressed: () {},
           ),
           IconButton(

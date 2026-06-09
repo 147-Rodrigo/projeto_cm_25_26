@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
 
 import 'API/maps.dart';
 import 'Style/custom_appbar.dart';
@@ -8,7 +9,7 @@ import 'eventos.dart';
 import 'donation.dart';
 import 'forum.dart';
 import 'info.dart';
-import 'main.dart';
+import 'noticias.dart';
 
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
@@ -21,11 +22,14 @@ class HomePage extends StatelessWidget {
         actions: [
           IconButton(
             icon: const Icon(Icons.newspaper),
-            onPressed: () {},
+            onPressed: () => Navigator.push(
+              context,
+              MaterialPageRoute(builder: (_) => const NoticiasPage()),
+            ),
           ),
 
           IconButton(
-            icon: const Icon(Icons.notifications),
+            icon: const Icon(Icons.notifications, color: Colors.white),
             onPressed: () {},
           ),
 
@@ -48,9 +52,21 @@ class HomePage extends StatelessWidget {
 
           // MAPA
           Expanded(
-            child: SizedBox.expand(
-              child: Maps(),
-            ),
+            child: kIsWeb
+                ? const Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(Icons.map, size: 80, color: Colors.green),
+                        SizedBox(height: 16),
+                        Text(
+                          "Mapa disponível apenas na app mobile",
+                          style: TextStyle(fontSize: 16, color: Colors.grey),
+                        ),
+                      ],
+                    ),
+                  )
+                : SizedBox.expand(child: Maps()),
           ),
 
           // BARRA INFERIOR

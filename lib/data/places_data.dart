@@ -1,6 +1,5 @@
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import '../models/place_point.dart';
-import 'package:flutter/material.dart';
 
 const List<PlacePoint> places = [
   PlacePoint(

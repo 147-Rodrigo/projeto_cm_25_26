@@ -132,7 +132,7 @@ class _MapsState extends State<Maps> {
             onMapCreated: (controller) => _googleMapController = controller,
 
             markers: {
-              if (_originMarker != null) _originMarker!,
+              ?_originMarker,
 
               ...MarkersService.buildMarkers(
                 (destino, id) {
@@ -142,7 +142,7 @@ class _MapsState extends State<Maps> {
                 _selectedMarkerId,
               ),
 
-              if (_destination != null) _destination!,
+              ?_destination,
             },
 
             polylines: {

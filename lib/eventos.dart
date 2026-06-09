@@ -12,6 +12,7 @@ import 'perfil.dart';
 import 'evento_detalhe.dart';
 import 'adicionar_evento.dart';
 import 'noticias.dart';
+import 'notificacoes.dart';
 
 class EventosPage extends StatelessWidget {
   const EventosPage({super.key});
@@ -49,9 +50,16 @@ class EventosPage extends StatelessWidget {
             ),
           ),
           IconButton(
-            icon: const Icon(Icons.notifications, color: Colors.white),
-            onPressed: () {},
-          ),
+  icon: const Icon(Icons.notifications),
+  onPressed: () {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => const NotificacoesPage(),
+      ),
+    );
+  },
+),
           IconButton(
             icon: const Icon(Icons.person),
             onPressed: () => Navigator.push(

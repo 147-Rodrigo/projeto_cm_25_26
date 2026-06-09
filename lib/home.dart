@@ -9,6 +9,7 @@ import 'eventos.dart';
 import 'donation.dart';
 import 'forum.dart';
 import 'info.dart';
+import 'notificacoes.dart';
 import 'noticias.dart';
 
 class HomePage extends StatelessWidget {
@@ -29,9 +30,16 @@ class HomePage extends StatelessWidget {
           ),
 
           IconButton(
-            icon: const Icon(Icons.notifications, color: Colors.white),
-            onPressed: () {},
-          ),
+  icon: const Icon(Icons.notifications),
+  onPressed: () {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => const NotificacoesPage(),
+      ),
+    );
+  },
+),
 
           IconButton(
             icon: const Icon(Icons.person),

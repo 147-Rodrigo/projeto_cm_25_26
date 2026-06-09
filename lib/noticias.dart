@@ -12,6 +12,7 @@ import 'info.dart';
 import 'perfil.dart';
 import 'adicionar_noticia.dart';
 import 'noticia_detalhe.dart';
+import 'notificacoes.dart';
 
 class NoticiasPage extends StatelessWidget {
   const NoticiasPage({super.key});
@@ -23,9 +24,16 @@ class NoticiasPage extends StatelessWidget {
         title: "Notícias",
         actions: [
           IconButton(
-            icon: const Icon(Icons.notifications, color: Colors.white),
-            onPressed: () {},
-          ),
+  icon: const Icon(Icons.notifications),
+  onPressed: () {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => const NotificacoesPage(),
+      ),
+    );
+  },
+),
           IconButton(
             icon: const Icon(Icons.person),
             onPressed: () => Navigator.push(

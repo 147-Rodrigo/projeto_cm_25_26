@@ -1,9 +1,40 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:projeto/Style/custom_appbar.dart';
+import 'package:projeto/services/LocalNotificationService%20.dart';
 
-class NotificacoesPage extends StatelessWidget {
+class NotificacoesPage extends StatefulWidget {
   const NotificacoesPage({super.key});
+
+  @override
+  State<NotificacoesPage> createState() => _NotificacoesPageState();
+}
+
+class _NotificacoesPageState extends State<NotificacoesPage> {
+  final stream = FirebaseFirestore.instance
+      .collection("notifications")
+      .orderBy("data", descending: true)
+      .snapshots();
+
+  @override
+  void initState() {
+    super.initState();
+
+    stream.listen((snapshot) {
+      for (var change in snapshot.docChanges) {
+        if (change.type == DocumentChangeType.added) {
+          final data = change.doc.data();
+
+          if (data != null) {
+            LocalNotificationService.instance.showNotification(
+              title: data["titulo"] ?? "",
+              body: data["mensagem"] ?? "",
+            );
+          }
+        }
+      }
+    });
+  }
 
   @override
   Widget build(BuildContext context) {

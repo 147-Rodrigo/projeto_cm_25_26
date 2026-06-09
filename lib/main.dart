@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:projeto/services/LocalNotificationService%20.dart';
 import 'firebase_options.dart';
 
 import 'login.dart';
@@ -12,6 +13,8 @@ void main() async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
+
+  await LocalNotificationService.instance.init();
 
   runApp(const MyApp());
 }

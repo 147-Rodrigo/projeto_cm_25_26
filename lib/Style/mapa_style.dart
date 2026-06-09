@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
 
 class MapaStyle {
-  // =====================================================
-  // 📊 INFO BOX
-  // =====================================================
+  // Info Box
   static BoxDecoration infoBox = BoxDecoration(
     color: Colors.yellowAccent,
     borderRadius: BorderRadius.circular(20),
@@ -24,9 +22,7 @@ class MapaStyle {
   static const EdgeInsets infoPadding =
       EdgeInsets.symmetric(vertical: 6, horizontal: 12);
 
-  // =====================================================
-  // 🟢 ORIGEM BUTTON
-  // =====================================================
+  // Botão Origem
   static final ButtonStyle originButton = ElevatedButton.styleFrom(
     backgroundColor: Colors.green,
     foregroundColor: Colors.white,
@@ -34,9 +30,7 @@ class MapaStyle {
     textStyle: const TextStyle(fontSize: 12),
   );
 
-  // =====================================================
-  // 🔵 DESTINO BUTTON
-  // =====================================================
+  // Botão Destino
   static final ButtonStyle destinationButton = ElevatedButton.styleFrom(
     backgroundColor: Colors.blue,
     foregroundColor: Colors.white,

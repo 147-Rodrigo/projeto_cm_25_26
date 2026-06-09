@@ -116,7 +116,7 @@ class InfoPage extends StatelessWidget {
             ),
           ),
 
-          // ✔️ Bottom Bar fixa
+          // Bottom Bar fixa
           Container(
             width: double.infinity,
             color: Colors.green,

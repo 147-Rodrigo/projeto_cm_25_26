@@ -182,9 +182,7 @@ Widget _buildButton(IconData icon, VoidCallback onTap) {
   }
 }
 
-// ==========================
 // INFO BOX
-// ==========================
 
 Widget _buildInfoBox(
   String title,

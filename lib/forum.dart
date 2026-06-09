@@ -193,10 +193,7 @@ class ForumPage extends StatelessWidget {
   }
 }
 
-// ==========================
 // INFO BOX
-// ==========================
-
 Widget _buildInfoBox(
   String username,
   String date,

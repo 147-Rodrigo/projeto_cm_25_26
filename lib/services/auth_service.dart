@@ -21,14 +21,14 @@ class AuthService {
     }
 
     try {
-      // 1. criar conta
+      // criar conta
       final userCredential =
           await _auth.createUserWithEmailAndPassword(
         email: email,
         password: password,
       );
 
-      // 2. guardar no Firestore
+      // guardar no Firestore
       await _db.collection("users").doc(userCredential.user!.uid).set({
         "nome": name,
         "email": email,

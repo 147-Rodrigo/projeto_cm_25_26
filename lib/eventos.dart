@@ -13,11 +13,23 @@ import 'evento_detalhe.dart';
 import 'adicionar_evento.dart';
 import 'noticias.dart';
 import 'notificacoes.dart';
-
-class EventosPage extends StatelessWidget {
+import 'services/admin_service.dart';
+class EventosPage extends StatefulWidget {
   const EventosPage({super.key});
 
-  // ─── Formata Timestamp ou String ────────────────────────────────────────────
+  @override
+  State<EventosPage> createState() => _EventosPageState();
+}
+
+class _EventosPageState extends State<EventosPage> {
+  bool _isAdmin = false;
+
+  @override
+  void initState() {
+    super.initState();
+    AdminService.isAdmin().then((v) => setState(() => _isAdmin = v));
+  }
+
   String _formatDate(dynamic value) {
     if (value == null) return '';
     if (value is Timestamp) {
@@ -36,18 +48,60 @@ class EventosPage extends StatelessWidget {
     return meses[m];
   }
 
+  // ─── Apagar evento (admin) ──────────────────────────────────────────────────
+  Future<void> _apagarEvento(String docId) async {
+    final confirmar = await showDialog<bool>(
+      context: context,
+      builder: (_) => AlertDialog(
+        title: const Text("Apagar evento?"),
+        content: const Text("Esta ação é irreversível."),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: const Text("Cancelar"),
+          ),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
+            onPressed: () => Navigator.pop(context, true),
+            child: const Text("Apagar",
+                style: TextStyle(color: Colors.white)),
+          ),
+        ],
+      ),
+    );
+
+    if (confirmar != true) return;
+
+    await FirebaseFirestore.instance
+        .collection('eventos')
+        .doc(docId)
+        .delete();
+
+    if (!mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text("Evento apagado.")),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: CustomAppBar(
         title: "Eventos",
         actions: [
+          if (_isAdmin)
+            const Tooltip(
+              message: "Modo Admin",
+              child: Padding(
+                padding: EdgeInsets.symmetric(horizontal: 4),
+                child: Icon(Icons.admin_panel_settings,
+                    color: Colors.amber, size: 22),
+              ),
+            ),
           IconButton(
             icon: const Icon(Icons.newspaper),
-            onPressed: () => Navigator.push(
-              context,
-              MaterialPageRoute(builder: (_) => const NoticiasPage()),
-            ),
+            onPressed: () => Navigator.push(context,
+                MaterialPageRoute(builder: (_) => const NoticiasPage())),
           ),
           IconButton(
   icon: const Icon(Icons.notifications),
@@ -62,21 +116,16 @@ class EventosPage extends StatelessWidget {
 ),
           IconButton(
             icon: const Icon(Icons.person),
-            onPressed: () => Navigator.push(
-              context,
-              MaterialPageRoute(builder: (_) => const PerfilPage()),
-            ),
+            onPressed: () => Navigator.push(context,
+                MaterialPageRoute(builder: (_) => const PerfilPage())),
           ),
         ],
       ),
 
-      // ─── FAB para adicionar evento ──────────────────────────────────────────
       floatingActionButton: FloatingActionButton(
         backgroundColor: Colors.green,
-        onPressed: () => Navigator.push(
-          context,
-          MaterialPageRoute(builder: (_) => const AdicionarEventoPage()),
-        ),
+        onPressed: () => Navigator.push(context,
+            MaterialPageRoute(builder: (_) => const AdicionarEventoPage())),
         tooltip: "Adicionar Evento",
         child: const Icon(Icons.add, color: Colors.white),
       ),
@@ -110,29 +159,23 @@ class EventosPage extends StatelessWidget {
                   child: Column(
                     children: [
                       const SizedBox(height: 20),
-
-                      const Text(
-                        "Eventos",
-                        style: AppTextStyles.welcomeTitle,
-                      ),
-
+                      const Text("Eventos", style: AppTextStyles.welcomeTitle),
                       const SizedBox(height: 20),
-
                       ...docs.map((doc) {
                         final data = doc.data() as Map<String, dynamic>;
                         return Padding(
                           padding: const EdgeInsets.only(bottom: 15),
-                          child: _buildEventoCard(
-                            context: context,
+                          child: _EventoCard(
                             docId: doc.id,
                             titulo: data['titulo'] as String? ?? '',
                             data: _formatDate(data['data']),
                             descricao: data['descricao'] as String? ?? '',
                             categoria: data['categoria'] as String? ?? '',
+                            isAdmin: _isAdmin,
+                            onDelete: () => _apagarEvento(doc.id),
                           ),
                         );
                       }),
-
                       const SizedBox(height: 20),
                     ],
                   ),
@@ -141,7 +184,7 @@ class EventosPage extends StatelessWidget {
             ),
           ),
 
-          // ─── Barra inferior ─────────────────────────────────────────────────
+          // Barra inferior
           Container(
             width: double.infinity,
             color: Colors.green,
@@ -152,12 +195,12 @@ class EventosPage extends StatelessWidget {
                   _buildButton(Icons.map, () => Navigator.push(context,
                       MaterialPageRoute(builder: (_) => const HomePage()))),
                   _divider(),
-                  // Eventos — não faz nada (já estamos aqui)
                   _buildButton(Icons.calendar_month, () {}),
                   _divider(),
                   _buildButton(Icons.volunteer_activism, () => Navigator.push(
                       context,
-                      MaterialPageRoute(builder: (_) => const DonationPage()))),
+                      MaterialPageRoute(
+                          builder: (_) => const DonationPage()))),
                   _divider(),
                   _buildButton(Icons.message, () => Navigator.push(context,
                       MaterialPageRoute(builder: (_) => const ForumPage()))),
@@ -184,91 +227,108 @@ class EventosPage extends StatelessWidget {
       Container(width: 1, height: 30, color: Colors.white30);
 }
 
-// ─── Card de evento (tapping → detalhe) ──────────────────────────────────────
-Widget _buildEventoCard({
-  required BuildContext context,
-  required String docId,
-  required String titulo,
-  required String data,
-  required String descricao,
-  required String categoria,
-}) {
-  return GestureDetector(
-    onTap: () => Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (_) => EventoDetalhePage(eventoId: docId),
+// ─── Card de evento ───────────────────────────────────────────────────────────
+class _EventoCard extends StatelessWidget {
+  final String docId;
+  final String titulo;
+  final String data;
+  final String descricao;
+  final String categoria;
+  final bool isAdmin;
+  final VoidCallback onDelete;
+
+  const _EventoCard({
+    required this.docId,
+    required this.titulo,
+    required this.data,
+    required this.descricao,
+    required this.categoria,
+    required this.isAdmin,
+    required this.onDelete,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: () => Navigator.push(
+        context,
+        MaterialPageRoute(
+            builder: (_) => EventoDetalhePage(eventoId: docId)),
       ),
-    ),
-    child: Container(
-      width: double.infinity,
-      margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 5),
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: const Color.fromRGBO(171, 255, 156, 1),
-        borderRadius: BorderRadius.circular(15),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // Ícone + Título + Data
-          Row(
-            children: [
-              CircleAvatar(
-                radius: 25,
-                backgroundColor: Colors.green,
-                child: const Icon(Icons.calendar_month,
-                    color: Colors.white, size: 26),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(titulo, style: AppTextStyles.forumUsername),
-                    const SizedBox(height: 4),
-                    Text(data, style: AppTextStyles.forumDate),
-                  ],
+      child: Container(
+        width: double.infinity,
+        margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 5),
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: const Color.fromRGBO(171, 255, 156, 1),
+          borderRadius: BorderRadius.circular(15),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                const CircleAvatar(
+                  radius: 25,
+                  backgroundColor: Colors.green,
+                  child: Icon(Icons.calendar_month,
+                      color: Colors.white, size: 26),
                 ),
-              ),
-              // Badge categoria
-              if (categoria.isNotEmpty)
-                Container(
-                  padding: const EdgeInsets.symmetric(
-                      horizontal: 8, vertical: 3),
-                  decoration: BoxDecoration(
-                    color: Colors.green.shade700,
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: Text(
-                    categoria,
-                    style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 10,
-                        fontWeight: FontWeight.bold),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(titulo, style: AppTextStyles.forumUsername),
+                      const SizedBox(height: 4),
+                      Text(data, style: AppTextStyles.forumDate),
+                    ],
                   ),
                 ),
-            ],
-          ),
-          const SizedBox(height: 12),
-          Text(descricao, style: AppTextStyles.forumText),
-          const SizedBox(height: 8),
-          // "Ver mais" hint
-          const Row(
-            mainAxisAlignment: MainAxisAlignment.end,
-            children: [
-              Text("Ver detalhes",
-                  style: TextStyle(
-                      color: Colors.green,
-                      fontSize: 12,
-                      fontWeight: FontWeight.bold)),
-              SizedBox(width: 4),
-              Icon(Icons.arrow_forward_ios,
-                  color: Colors.green, size: 12),
-            ],
-          ),
-        ],
+                if (categoria.isNotEmpty)
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 8, vertical: 3),
+                    decoration: BoxDecoration(
+                      color: Colors.green.shade700,
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Text(
+                      categoria,
+                      style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 10,
+                          fontWeight: FontWeight.bold),
+                    ),
+                  ),
+                // Botão apagar — só admin
+                if (isAdmin)
+                  IconButton(
+                    icon: const Icon(Icons.delete_outline,
+                        color: Colors.red, size: 22),
+                    tooltip: "Apagar evento",
+                    onPressed: onDelete,
+                  ),
+              ],
+            ),
+            const SizedBox(height: 12),
+            Text(descricao, style: AppTextStyles.forumText),
+            const SizedBox(height: 8),
+            const Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                Text("Ver detalhes",
+                    style: TextStyle(
+                        color: Colors.green,
+                        fontSize: 12,
+                        fontWeight: FontWeight.bold)),
+                SizedBox(width: 4),
+                Icon(Icons.arrow_forward_ios, color: Colors.green, size: 12),
+              ],
+            ),
+          ],
+        ),
       ),
-    ),
-  );
+    );
+  }
 }

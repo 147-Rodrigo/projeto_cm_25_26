@@ -7,12 +7,10 @@ import 'Style/text_styles.dart';
 import 'perfil.dart';
 
 class EventoDetalhePage extends StatelessWidget {
-  /// Passa o ID do documento Firestore ou os dados já carregados.
   final String eventoId;
 
   const EventoDetalhePage({super.key, required this.eventoId});
 
-  // ─── Formata Timestamp ──────────────────────────────────────────────────────
   String _formatDate(dynamic value) {
     if (value == null) return '';
     DateTime dt;
@@ -62,7 +60,7 @@ class EventoDetalhePage extends StatelessWidget {
           final titulo = data['titulo'] as String? ?? '';
           final descricao = data['descricao'] as String? ?? '';
           final local = data['local'] as String? ?? '';
-          final data_ = _formatDate(data['data']);
+          final dataEvento = _formatDate(data['data']);
           final organizador = data['organizador'] as String? ?? '';
           final categoria = data['categoria'] as String? ?? '';
           final imageUrl = data['imagemUrl'] as String?;
@@ -78,7 +76,8 @@ class EventoDetalhePage extends StatelessWidget {
                     height: 200,
                     width: double.infinity,
                     fit: BoxFit.cover,
-                    errorBuilder: (_, _, _) => const SizedBox.shrink(),
+                    errorBuilder: (context, error, stackTrace) =>
+                        const SizedBox.shrink(),
                   )
                 else
                   Container(
@@ -114,7 +113,6 @@ class EventoDetalhePage extends StatelessWidget {
 
                       const SizedBox(height: 12),
 
-                      // Título
                       Text(titulo,
                           style: const TextStyle(
                               fontSize: 22,
@@ -122,8 +120,7 @@ class EventoDetalhePage extends StatelessWidget {
 
                       const SizedBox(height: 16),
 
-                      // Informações rápidas
-                      _infoRow(Icons.calendar_today, data_),
+                      _infoRow(Icons.calendar_today, dataEvento),
                       const SizedBox(height: 8),
                       _infoRow(Icons.location_on, local),
                       const SizedBox(height: 8),
@@ -132,12 +129,10 @@ class EventoDetalhePage extends StatelessWidget {
 
                       const SizedBox(height: 20),
 
-                      // Divider
                       const Divider(color: Colors.green),
 
                       const SizedBox(height: 12),
 
-                      // Descrição
                       const Text(
                         "Descrição",
                         style: TextStyle(

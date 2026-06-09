@@ -13,6 +13,7 @@ class AuthService {
     required String password,
     required String dataNascimento,
     required String localizacao,
+    String role = 'utilizador',
   }) async {
     
     // validação da senha antes do Firebase
@@ -34,6 +35,7 @@ class AuthService {
         "email": email,
         "dataNascimento": dataNascimento,
         "localizacao": localizacao,
+        "role": role,
       });
     } on FirebaseAuthException catch (e) {
       if (e.code == 'email-already-in-use') {

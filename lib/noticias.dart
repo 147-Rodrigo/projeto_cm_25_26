@@ -183,7 +183,7 @@ class _NoticiaCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final titulo = data['titulo'] as String? ?? '';
-    final descricao = data['descricao'] as String? ?? '';
+    final resumo = data['resumo'] as String? ?? '';
     final fonte = data['fonte'] as String? ?? '';
     final ts = data['dataPublicacao'] as Timestamp?;
     final dataFormatada =
@@ -286,7 +286,7 @@ class _NoticiaCard extends StatelessWidget {
                 const SizedBox(height: 6),
 
                 Text(
-                  descricao,
+                  resumo,
                   style: AppTextStyles.forumText,
                   maxLines: 3,
                   overflow: TextOverflow.ellipsis,

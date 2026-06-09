@@ -127,9 +127,9 @@ class NoticiaDetalhePage extends StatelessWidget {
                   const SizedBox(height: 16),
 
                   // ─── Descrição (introdução) ───────────────────────────
-                  if (descricao.isNotEmpty) ...[
+                  if (artigo.isNotEmpty) ...[
                     Text(
-                      descricao,
+                      artigo,
                       style: const TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.w600,
@@ -144,7 +144,7 @@ class NoticiaDetalhePage extends StatelessWidget {
 
                   // ─── Artigo completo ──────────────────────────────────
                   Text(
-                    artigo,
+                    descricao,
                     style: const TextStyle(
                       fontSize: 16,
                       height: 1.7,

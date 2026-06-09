@@ -26,16 +26,16 @@ class DonationPage extends StatelessWidget {
             ),
           ),
           IconButton(
-  icon: const Icon(Icons.notifications),
-  onPressed: () {
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => const NotificacoesPage(),
-      ),
-    );
-  },
-),
+            icon: const Icon(Icons.notifications),
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const NotificacoesPage(),
+                ),
+              );
+            },
+          ),
           IconButton(
             icon: const Icon(Icons.person),
             onPressed: () {
@@ -43,9 +43,10 @@ class DonationPage extends StatelessWidget {
                 context,
                 MaterialPageRoute(
                   builder: (context) => const PerfilPage(),
-                  ),
-                );
-              }),
+                ),
+              );
+            },
+          ),
         ],
       ),
 
@@ -55,50 +56,48 @@ class DonationPage extends StatelessWidget {
             child: SingleChildScrollView(
               child: Column(
                 children: [
-
                   const SizedBox(height: 20),
 
                   const Text(
-                    "Doar",
+                    "Escolha uma ONG para doar",
                     style: AppTextStyles.welcomeTitle,
                   ),
 
                   const SizedBox(height: 20),
 
-                  _buildInfoBox(
-                    "Cáritas Portuguesa",
-                    "assets/doações/caritas.png",
-                    ),
-
-                  const SizedBox(height: 15),
-
-                  _buildInfoBox(
-                    "Banco Alimentar Contra a Fome",
-                    "assets/doações/banco_alimentar.png",
-                    ),
-
-                  const SizedBox(height: 15),
-
-                  _buildInfoBox("Comunidade Vida e Paz",
-                  "assets/doações/comunidade_vida.png",
+                  _DonationCard(
+                    title: "Cáritas Portuguesa",
+                    imagePath: "assets/doações/caritas.png",
                   ),
-
                   const SizedBox(height: 15),
 
-                  _buildInfoBox("Santa Casa da Misericórdia",
-                  "assets/doações/santa_casa.png",
+                  _DonationCard(
+                    title: "Banco Alimentar Contra a Fome",
+                    imagePath: "assets/doações/banco_alimentar.png",
                   ),
-
                   const SizedBox(height: 15),
 
-                  _buildInfoBox("Cruz Vermelha Portuguesa",
-                  "assets/doações/cruz.png",
+                  _DonationCard(
+                    title: "Comunidade Vida e Paz",
+                    imagePath: "assets/doações/comunidade_vida.png",
                   ),
-
                   const SizedBox(height: 15),
 
-                  _buildInfoBox("Liga dos Bombeiros Portugueses",
-                  "assets/doações/bombeiros.png",
+                  _DonationCard(
+                    title: "Santa Casa da Misericórdia",
+                    imagePath: "assets/doações/santa_casa.png",
+                  ),
+                  const SizedBox(height: 15),
+
+                  _DonationCard(
+                    title: "Cruz Vermelha Portuguesa",
+                    imagePath: "assets/doações/cruz.png",
+                  ),
+                  const SizedBox(height: 15),
+
+                  _DonationCard(
+                    title: "Liga dos Bombeiros Portugueses",
+                    imagePath: "assets/doações/bombeiros.png",
                   ),
 
                   const SizedBox(height: 20),
@@ -107,7 +106,7 @@ class DonationPage extends StatelessWidget {
             ),
           ),
 
-          //Barra de ícones
+          // Barra de navegação
           Container(
             width: double.infinity,
             color: Colors.green,
@@ -115,47 +114,26 @@ class DonationPage extends StatelessWidget {
               height: 60,
               child: Row(
                 children: [
-                  //Mapa
-                  _buildButton(Icons.map, () {
-                    Navigator.push(context, MaterialPageRoute(builder: (context) => const HomePage(),
-                    ),
-                    );
-                  }),
-
-                  _divider(),
-
-                  //Eventos
-                  _buildButton(Icons.calendar_month, () {
-                    Navigator.push(context, MaterialPageRoute(builder: (context) => const EventosPage(),
-                    ),
-                    );
+                  _buildNavButton(Icons.map, () {
+                    Navigator.push(context,
+                        MaterialPageRoute(builder: (context) => const HomePage()));
                   }),
                   _divider(),
-
-                  //Doações (não faz nada)
-                  _buildButton(Icons.volunteer_activism, () {}),
-                  _divider(),
-
-                  //Mensagens
-                  _buildButton(Icons.message, () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => const ForumPage(),
-                      ),
-                    );
+                  _buildNavButton(Icons.calendar_month, () {
+                    Navigator.push(context,
+                        MaterialPageRoute(builder: (context) => const EventosPage()));
                   }),
-
                   _divider(),
-
-                  //Info
-                  _buildButton(Icons.info, () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => const InfoPage(),
-                      ),
-                    );
+                  _buildNavButton(Icons.volunteer_activism, () {}),
+                  _divider(),
+                  _buildNavButton(Icons.message, () {
+                    Navigator.push(context,
+                        MaterialPageRoute(builder: (context) => const ForumPage()));
+                  }),
+                  _divider(),
+                  _buildNavButton(Icons.info, () {
+                    Navigator.push(context,
+                        MaterialPageRoute(builder: (context) => const InfoPage()));
                   }),
                 ],
               ),
@@ -166,71 +144,263 @@ class DonationPage extends StatelessWidget {
     );
   }
 
-Widget _buildButton(IconData icon, VoidCallback onTap) {
+  Widget _buildNavButton(IconData icon, VoidCallback onTap) {
     return Expanded(
       child: InkWell(
         onTap: onTap,
         child: Center(
-          child: Icon(
-            icon,
-            color: Colors.white,
-            size: 28,
-          ),
+          child: Icon(icon, color: Colors.white, size: 28),
         ),
       ),
     );
   }
 
   Widget _divider() {
-    return Container(
-      width: 1,
-      height: 30,
-      color: Colors.white30,
-    );
+    return Container(width: 1, height: 30, color: Colors.white30);
   }
 }
 
-// INFO BOX
+// ─── DONATION CARD ────────────────────────────────────────────────────────────
 
-Widget _buildInfoBox(
-  String title,
-  String imagePath,
-) {
-  return Container(
-    width: double.infinity,
+class _DonationCard extends StatefulWidget {
+  final String title;
+  final String imagePath;
 
-    margin: const EdgeInsets.symmetric(
-      horizontal: 20,
-      vertical: 5,
-    ),
+  const _DonationCard({required this.title, required this.imagePath});
 
-    padding: const EdgeInsets.all(16),
+  @override
+  State<_DonationCard> createState() => _DonationCardState();
+}
 
-    decoration: BoxDecoration(
-      color: const Color.fromRGBO(171, 255, 156, 1),
-      borderRadius: BorderRadius.circular(15),
-    ),
+class _DonationCardState extends State<_DonationCard> {
+  bool _expanded = false;
+  int? _selectedAmount;
 
-    child: Row(
-      children: [
+  static const List<int> _amounts = [10, 20, 40, 60, 80, 100];
 
-        // IMAGEM
-        CircleAvatar(
-          radius: 25,
+  void _showSuccessDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext ctx) {
+        return AlertDialog(
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
           backgroundColor: Colors.white,
-          backgroundImage: AssetImage(imagePath),
-        ),
-
-        const SizedBox(width: 15),
-
-        // TEXTO
-        Expanded(
-          child: Text(
-            title,
-            style: AppTextStyles.cardTitle,
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const SizedBox(height: 8),
+              Container(
+                width: 70,
+                height: 70,
+                decoration: const BoxDecoration(
+                  color: Color.fromRGBO(171, 255, 156, 1),
+                  shape: BoxShape.circle,
+                ),
+                child: const Icon(
+                  Icons.favorite,
+                  color: Colors.green,
+                  size: 40,
+                ),
+              ),
+              const SizedBox(height: 16),
+              const Text(
+                "Doação Realizada!",
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.black87,
+                ),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 10),
+              Text(
+                "A sua doação de ${_selectedAmount}€ para\n${widget.title}\nfoi realizada com sucesso.",
+                style: const TextStyle(fontSize: 14, color: Colors.black54, height: 1.5),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 8),
+              const Text(
+                "Obrigado pela sua generosidade e por fazer a diferença! 💚",
+                style: TextStyle(fontSize: 13, color: Colors.green, fontWeight: FontWeight.w600),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 20),
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton(
+                  onPressed: () {
+                    Navigator.of(ctx).pop();
+                    setState(() {
+                      _expanded = false;
+                      _selectedAmount = null;
+                    });
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.green,
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12)),
+                    padding: const EdgeInsets.symmetric(vertical: 12),
+                  ),
+                  child: const Text(
+                    "Fechar",
+                    style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold),
+                  ),
+                ),
+              ),
+            ],
           ),
-        ),
-      ],
-    ),
-  );
+        );
+      },
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AnimatedContainer(
+      duration: const Duration(milliseconds: 300),
+      curve: Curves.easeInOut,
+      width: double.infinity,
+      margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 5),
+      decoration: BoxDecoration(
+        color: const Color.fromRGBO(171, 255, 156, 1),
+        borderRadius: BorderRadius.circular(15),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.green.withOpacity(0.15),
+            blurRadius: 6,
+            offset: const Offset(0, 3),
+          ),
+        ],
+      ),
+      child: Column(
+        children: [
+          // ── Cabeçalho clicável ──
+          InkWell(
+            borderRadius: BorderRadius.circular(15),
+            onTap: () {
+              setState(() {
+                _expanded = !_expanded;
+                if (!_expanded) _selectedAmount = null;
+              });
+            },
+            child: Padding(
+              padding: const EdgeInsets.all(16),
+              child: Row(
+                children: [
+                  CircleAvatar(
+                    radius: 25,
+                    backgroundColor: Colors.white,
+                    backgroundImage: AssetImage(widget.imagePath),
+                  ),
+                  const SizedBox(width: 15),
+                  Expanded(
+                    child: Text(widget.title, style: AppTextStyles.cardTitle),
+                  ),
+                  Icon(
+                    _expanded ? Icons.expand_less : Icons.expand_more,
+                    color: Colors.green.shade700,
+                    size: 26,
+                  ),
+                ],
+              ),
+            ),
+          ),
+
+          // ── Painel de doação expansível ──
+          if (_expanded) ...[
+            const Divider(height: 1, color: Colors.green, thickness: 0.5),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(16, 14, 16, 16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text(
+                    "Escolha o valor a doar:",
+                    style: TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w600,
+                      color: Colors.black87,
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+
+                  // Grade de valores 3x2
+                  GridView.builder(
+                    shrinkWrap: true,
+                    physics: const NeverScrollableScrollPhysics(),
+                    gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: 3,
+                      mainAxisSpacing: 8,
+                      crossAxisSpacing: 8,
+                      childAspectRatio: 2.2,
+                    ),
+                    itemCount: _amounts.length,
+                    itemBuilder: (context, index) {
+                      final amount = _amounts[index];
+                      final isSelected = _selectedAmount == amount;
+                      return GestureDetector(
+                        onTap: () => setState(() => _selectedAmount = amount),
+                        child: AnimatedContainer(
+                          duration: const Duration(milliseconds: 200),
+                          decoration: BoxDecoration(
+                            color: isSelected ? Colors.green : Colors.white,
+                            borderRadius: BorderRadius.circular(8),
+                            border: Border.all(
+                              color: isSelected ? Colors.green.shade700 : Colors.green.shade300,
+                              width: 1.5,
+                            ),
+                          ),
+                          child: Center(
+                            child: Text(
+                              "$amount€",
+                              style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 16,
+                                color: isSelected ? Colors.white : Colors.green.shade800,
+                              ),
+                            ),
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+
+                  const SizedBox(height: 16),
+
+                  // Botão Doar
+                  SizedBox(
+                    width: double.infinity,
+                    child: ElevatedButton(
+                      onPressed: _selectedAmount == null
+                          ? null
+                          : () => _showSuccessDialog(context),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.green,
+                        disabledBackgroundColor: Colors.green.shade200,
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12)),
+                        padding: const EdgeInsets.symmetric(vertical: 13),
+                        elevation: 2,
+                      ),
+                      child: Text(
+                        _selectedAmount == null
+                            ? "Selecione um valor"
+                            : "Doar ${_selectedAmount}€",
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ],
+      ),
+    );
+  }
 }

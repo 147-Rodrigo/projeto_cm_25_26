@@ -1,17 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:projeto/services/admin_service.dart';
+import 'package:projeto/core/services/admin_service.dart';
 
 import 'adicionar_comentario.dart';
-import 'Style/custom_appbar.dart';
-import 'Style/text_styles.dart';
-import 'home.dart';
-import 'eventos.dart';
-import 'donation.dart';
-import 'info.dart';
-import 'perfil.dart';
-import 'noticias.dart';
-import 'notificacoes.dart';
+import '../../core/Style/custom_appbar.dart';
+import '../../core/Style/text_styles.dart';
+import '../home/home.dart';
+import '../eventos/eventos.dart';
+import '../donation/donation.dart';
+import '../info/info.dart';
+import '../profile/perfil.dart';
+import '../noticias/noticias.dart';
+import '../notificacoes/notificacoes.dart';
 
 class ForumPage extends StatefulWidget {
   const ForumPage({super.key});

@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:projeto/Style/custom_appbar.dart';
-import 'package:projeto/services/auth_service.dart';
+import 'package:projeto/core/Style/custom_appbar.dart';
+import 'package:projeto/core/services/auth_service.dart';
 
-import 'Style/profile_styles.dart';
+import '../../core/Style/profile_styles.dart';
 
-import 'main.dart';
+import '../../main.dart';
 
 class PerfilPage extends StatelessWidget {
   const PerfilPage({super.key});

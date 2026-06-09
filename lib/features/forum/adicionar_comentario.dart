@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'Style/add_com.dart';
+import '../../core/Style/add_com.dart';
 
 class AdicionarComentarioPage extends StatefulWidget {
   const AdicionarComentarioPage({super.key});

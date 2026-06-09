@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:projeto/Style/custom_appbar.dart';
-import 'package:projeto/services/LocalNotificationService%20.dart';
+import 'package:projeto/core/Style/custom_appbar.dart';
+import 'package:projeto/core/services/local_notification_service.dart';
 
 class NotificacoesPage extends StatefulWidget {
   const NotificacoesPage({super.key});

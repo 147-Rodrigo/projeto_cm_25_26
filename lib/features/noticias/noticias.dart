@@ -1,19 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
-import 'Style/custom_appbar.dart';
-import 'Style/text_styles.dart';
+import '../../core/Style/custom_appbar.dart';
+import '../../core/Style/text_styles.dart';
 
-import 'home.dart';
-import 'eventos.dart';
-import 'donation.dart';
-import 'forum.dart';
-import 'info.dart';
-import 'perfil.dart';
+import '../home/home.dart';
+import '../eventos/eventos.dart';
+import '../donation/donation.dart';
+import '../forum/forum.dart';
+import '../info/info.dart';
+import '../profile/perfil.dart';
 import 'adicionar_noticia.dart';
 import 'noticia_detalhe.dart';
-import 'notificacoes.dart';
-import 'services/admin_service.dart';
+import '../notificacoes/notificacoes.dart';
+import '../../core/services/admin_service.dart';
 
 class NoticiasPage extends StatefulWidget {
   const NoticiasPage({super.key});

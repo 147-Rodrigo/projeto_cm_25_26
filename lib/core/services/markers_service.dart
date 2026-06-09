@@ -1,5 +1,5 @@
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import '../data/places_data.dart';
+import '../../shared/data/places_data.dart';
 
 class MarkersService {
   static Set<Marker> buildMarkers(

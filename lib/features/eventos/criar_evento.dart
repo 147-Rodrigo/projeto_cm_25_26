@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'Style/custom_appbar.dart';
-import 'Style/text_styles.dart';
-import 'services/event_service.dart';
+import '../../core/Style/custom_appbar.dart';
+import '../../core/Style/text_styles.dart';
+import '../../core/services/event_service.dart';
 
 class CriarEventoPage extends StatefulWidget {
   // Se eventoData for fornecido, entra em modo de edição

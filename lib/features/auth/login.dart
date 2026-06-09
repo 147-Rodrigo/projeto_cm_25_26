@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 
-import 'services/auth_service.dart';
+import '../../core/services/auth_service.dart';
 
-import 'Style/custom_appbar.dart';
-import 'Style/text_styles.dart';
+import '../../core/Style/custom_appbar.dart';
+import '../../core/Style/text_styles.dart';
 
-import 'home.dart';
+import '../home/home.dart';
 import 'registo.dart';
-import 'main.dart';
+import '../../main.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});

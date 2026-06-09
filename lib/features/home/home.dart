@@ -1,16 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart';
 
-import 'API/maps.dart';
-import 'Style/custom_appbar.dart';
+import '../../core/utils/maps.dart';
+import '../../core/Style/custom_appbar.dart';
 
-import 'perfil.dart';
-import 'eventos.dart';
-import 'donation.dart';
-import 'forum.dart';
-import 'info.dart';
-import 'notificacoes.dart';
-import 'noticias.dart';
+import '../profile/perfil.dart';
+import '../eventos/eventos.dart';
+import '../donation/donation.dart';
+import '../forum/forum.dart';
+import '../info/info.dart';
+import '../notificacoes/notificacoes.dart';
+import '../noticias/noticias.dart';
 
 class HomePage extends StatelessWidget {
   const HomePage({super.key});

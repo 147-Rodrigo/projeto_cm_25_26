@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
-import 'Style/custom_appbar.dart';
-import 'Style/text_styles.dart';
-import 'home.dart';
-import 'eventos.dart';
-import 'donation.dart';
-import 'forum.dart';
-import 'perfil.dart';
-import 'noticias.dart';
-import 'notificacoes.dart';
+import '../../core/Style/custom_appbar.dart';
+import '../../core/Style/text_styles.dart';
+import '../home/home.dart';
+import '../eventos/eventos.dart';
+import '../donation/donation.dart';
+import '../forum/forum.dart';
+import '../profile/perfil.dart';
+import '../noticias/noticias.dart';
+import '../notificacoes/notificacoes.dart';
 
 class InfoPage extends StatelessWidget {
   const InfoPage({super.key});

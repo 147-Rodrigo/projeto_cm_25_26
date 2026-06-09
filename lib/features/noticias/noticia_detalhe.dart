@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
-import 'Style/custom_appbar.dart';
-import 'Style/text_styles.dart';
+import '../../core/Style/custom_appbar.dart';
+import '../../core/Style/text_styles.dart';
 
 class NoticiaDetalhePage extends StatelessWidget {
   final String docId;

@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
-import 'Style/custom_appbar.dart';
-import 'Style/text_styles.dart';
-import 'home.dart';
-import 'eventos.dart';
-import 'forum.dart';
-import 'info.dart';
-import 'perfil.dart';
-import 'notificacoes.dart';
-import 'noticias.dart';
+import '../../core/Style/custom_appbar.dart';
+import '../../core/Style/text_styles.dart';
+import '../home/home.dart';
+import '../eventos/eventos.dart';
+import '../forum/forum.dart';
+import '../info/info.dart';
+import '../profile/perfil.dart';
+import '../notificacoes/notificacoes.dart';
+import '../noticias/noticias.dart';
 
 class DonationPage extends StatelessWidget {
   const DonationPage({super.key});

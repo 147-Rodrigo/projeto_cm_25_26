@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
-import 'Style/custom_appbar.dart';
+import '../../core/Style/custom_appbar.dart';
 
 class AdicionarNoticiaPage extends StatefulWidget {
   /// Se fornecido, entra em modo de edição.

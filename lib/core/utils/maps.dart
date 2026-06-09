@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
-import 'package:projeto/services/directions_model.dart';
-import 'package:projeto/services/directions_repository.dart';
-import 'package:projeto/services/markers_service.dart';
+import 'package:projeto/core/services/directions_model.dart';
+import 'package:projeto/core/services/directions_repository.dart';
+import 'package:projeto/core/services/markers_service.dart';
 
-import 'package:projeto/Style/mapa_style.dart';
+import 'package:projeto/core/Style/mapa_style.dart';
 
 class Maps extends StatefulWidget {
   const Maps({super.key});

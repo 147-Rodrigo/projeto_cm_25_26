@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'package:projeto/services/LocalNotificationService%20.dart';
+import 'package:projeto/core/services/local_notification_service.dart';
 import 'firebase_options.dart';
 
-import 'login.dart';
-import 'registo.dart';
+import 'features/auth/login.dart';
+import 'features/auth/registo.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();

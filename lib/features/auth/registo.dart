@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 
-import 'Style/custom_appbar.dart';
-import 'Style/text_styles.dart';
+import '../../core/Style/custom_appbar.dart';
+import '../../core/Style/text_styles.dart';
 
 import 'login.dart';
-import 'main.dart';
-import 'services/auth_service.dart';
+import '../../main.dart';
+import '../../core/services/auth_service.dart';
 
 class RegistoPage extends StatefulWidget {
   const RegistoPage({super.key});

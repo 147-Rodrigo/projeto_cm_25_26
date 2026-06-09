@@ -2,8 +2,8 @@ import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
-import 'package:projeto/services/directions_model.dart';
-import 'package:projeto/services/.env.dart';
+import 'package:projeto/core/services/directions_model.dart';
+import 'package:projeto/core/utils/.env.dart';
 
 class DirectionsRepository {
   static const String _baseUrl =

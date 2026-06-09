@@ -96,22 +96,10 @@ class _NoticiasPageState extends State<NoticiasPage> {
         ],
       ),
 
-      // FAB — só visível para admin
-      floatingActionButton: _isAdmin
-          ? FloatingActionButton(
-              backgroundColor: Colors.green,
-              onPressed: () => Navigator.push(
-                context,
-                MaterialPageRoute(
-                    builder: (_) => const AdicionarNoticiaPage()),
-              ),
-              tooltip: "Adicionar Notícia",
-              child: const Icon(Icons.add, color: Colors.white),
-            )
-          : null,
-
-      body: Column(
+      body: Stack(
         children: [
+          Column(
+            children: [
           Expanded(
             child: StreamBuilder<QuerySnapshot>(
               stream: FirebaseFirestore.instance
@@ -157,6 +145,23 @@ class _NoticiasPageState extends State<NoticiasPage> {
           _BottomBar(),
         ],
       ),
+
+          Positioned(
+      bottom: 80,
+      right: 20,
+      child: FloatingActionButton(
+        backgroundColor: Colors.green,
+        onPressed: () => Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (_) => const AdicionarNoticiaPage(),
+          ),
+        ),
+        child: const Icon(Icons.add, color: Colors.white),
+      ),
+    ),
+  ],
+),
     );
   }
 }
@@ -181,7 +186,8 @@ class _NoticiaCard extends StatelessWidget {
     final descricao = data['descricao'] as String? ?? '';
     final fonte = data['fonte'] as String? ?? '';
     final ts = data['dataPublicacao'] as Timestamp?;
-    final dataFormatada = ts != null ? _formatDate(ts.toDate()) : '';
+    final dataFormatada =
+        ts != null ? _formatDate(ts.toDate()) : '';
     final imageUrl = data['imagemUrl'] as String?;
     final categoria = data['categoria'] as String? ?? 'Geral';
 
@@ -202,7 +208,8 @@ class _NoticiaCard extends StatelessWidget {
               height: 160,
               width: double.infinity,
               fit: BoxFit.cover,
-              errorBuilder: (_, __, ___) => const SizedBox.shrink(),
+              errorBuilder: (_, __, ___) =>
+                  const SizedBox.shrink(),
             ),
 
           Padding(
@@ -210,7 +217,7 @@ class _NoticiaCard extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Categoria + botões admin
+                // Categoria + ações admin
                 Row(
                   children: [
                     Container(
@@ -223,34 +230,43 @@ class _NoticiaCard extends StatelessWidget {
                       child: Text(
                         categoria,
                         style: const TextStyle(
-                            color: Colors.white,
-                            fontSize: 11,
-                            fontWeight: FontWeight.bold),
+                          color: Colors.white,
+                          fontSize: 11,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
                     ),
                     const Spacer(),
-                    // Ações admin
+
                     if (isAdmin) ...[
                       IconButton(
-                        icon: const Icon(Icons.edit,
-                            color: Colors.green, size: 20),
+                        icon: const Icon(
+                          Icons.edit,
+                          color: Colors.green,
+                          size: 20,
+                        ),
                         tooltip: "Editar",
                         padding: EdgeInsets.zero,
                         constraints: const BoxConstraints(),
-                        onPressed: () => Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (_) => AdicionarNoticiaPage(
-                              docId: docId,
-                              dadosExistentes: data,
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) => AdicionarNoticiaPage(
+                                docId: docId,
+                                dadosExistentes: data,
+                              ),
                             ),
-                          ),
-                        ),
+                          );
+                        },
                       ),
                       const SizedBox(width: 8),
                       IconButton(
-                        icon: const Icon(Icons.delete_outline,
-                            color: Colors.red, size: 20),
+                        icon: const Icon(
+                          Icons.delete_outline,
+                          color: Colors.red,
+                          size: 20,
+                        ),
                         tooltip: "Apagar",
                         padding: EdgeInsets.zero,
                         constraints: const BoxConstraints(),
@@ -259,9 +275,14 @@ class _NoticiaCard extends StatelessWidget {
                     ],
                   ],
                 ),
+
                 const SizedBox(height: 8),
 
-                Text(titulo, style: AppTextStyles.forumUsername),
+                Text(
+                  titulo,
+                  style: AppTextStyles.forumUsername,
+                ),
+
                 const SizedBox(height: 6),
 
                 Text(
@@ -270,14 +291,21 @@ class _NoticiaCard extends StatelessWidget {
                   maxLines: 3,
                   overflow: TextOverflow.ellipsis,
                 ),
+
                 const SizedBox(height: 10),
 
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     if (fonte.isNotEmpty)
-                      Text('📰 $fonte', style: AppTextStyles.forumDate),
-                    Text(dataFormatada, style: AppTextStyles.forumDate),
+                      Text(
+                        '📰 $fonte',
+                        style: AppTextStyles.forumDate,
+                      ),
+                    Text(
+                      dataFormatada,
+                      style: AppTextStyles.forumDate,
+                    ),
                   ],
                 ),
 
@@ -290,23 +318,32 @@ class _NoticiaCard extends StatelessWidget {
                       backgroundColor: Colors.green,
                       foregroundColor: Colors.white,
                       padding: const EdgeInsets.symmetric(
-                          horizontal: 16, vertical: 8),
+                        horizontal: 16,
+                        vertical: 8,
+                      ),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(20),
                       ),
                     ),
-                    onPressed: () => Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (_) => NoticiaDetalhePage(
-                          docId: docId,
-                          data: data,
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => NoticiaDetalhePage(
+                            docId: docId,
+                            data: data,
+                          ),
                         ),
-                      ),
+                      );
+                    },
+                    icon: const Icon(
+                      Icons.article_outlined,
+                      size: 16,
                     ),
-                    icon: const Icon(Icons.article_outlined, size: 16),
-                    label: const Text("Ler mais",
-                        style: TextStyle(fontWeight: FontWeight.bold)),
+                    label: const Text(
+                      "Ler mais",
+                      style: TextStyle(fontWeight: FontWeight.bold),
+                    ),
                   ),
                 ),
               ],

@@ -196,7 +196,7 @@ class _AdicionarNoticiaPageState extends State<AdicionarNoticiaPage> {
                   controller: _resumoController,
                   maxLines: 8,
                   decoration: const InputDecoration(
-                    labelText: "Artigo * (texto completo ao clicar em Ler mais)",
+                    labelText: "Artigo *",
                     border: OutlineInputBorder(),
                     prefixIcon: Icon(Icons.description),
                     alignLabelWithHint: true,

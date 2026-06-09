@@ -17,21 +17,20 @@ import '../../core/services/admin_service.dart';
 
 class NoticiasPage extends StatefulWidget {
   const NoticiasPage({super.key});
-
+ 
   @override
   State<NoticiasPage> createState() => _NoticiasPageState();
 }
-
+ 
 class _NoticiasPageState extends State<NoticiasPage> {
   bool _isAdmin = false;
-
+ 
   @override
   void initState() {
     super.initState();
     AdminService.isAdmin().then((v) => setState(() => _isAdmin = v));
   }
-
-  // ─── Apagar notícia (admin) ─────────────────────────────────────────────────
+ 
   Future<void> _apagarNoticia(String docId) async {
     final confirmar = await showDialog<bool>(
       context: context,
@@ -52,20 +51,20 @@ class _NoticiasPageState extends State<NoticiasPage> {
         ],
       ),
     );
-
+ 
     if (confirmar != true) return;
-
+ 
     await FirebaseFirestore.instance
         .collection('noticias')
         .doc(docId)
         .delete();
-
+ 
     if (!mounted) return;
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(content: Text("Notícia apagada.")),
     );
   }
-
+ 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -83,10 +82,8 @@ class _NoticiasPageState extends State<NoticiasPage> {
             ),
           IconButton(
             icon: const Icon(Icons.notifications),
-            onPressed: () => Navigator.push(
-              context,
-              MaterialPageRoute(builder: (_) => const NotificacoesPage()),
-            ),
+            onPressed: () => Navigator.push(context,
+                MaterialPageRoute(builder: (_) => const NotificacoesPage())),
           ),
           IconButton(
             icon: const Icon(Icons.person),
@@ -95,11 +92,23 @@ class _NoticiasPageState extends State<NoticiasPage> {
           ),
         ],
       ),
-
-      body: Stack(
+ 
+      // FAB apenas visível para admins
+      floatingActionButton: _isAdmin
+          ? FloatingActionButton(
+              backgroundColor: Colors.green,
+              onPressed: () => Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (_) => const AdicionarNoticiaPage()),
+              ),
+              tooltip: "Adicionar Notícia",
+              child: const Icon(Icons.add, color: Colors.white),
+            )
+          : null,
+ 
+      body: Column(
         children: [
-          Column(
-            children: [
           Expanded(
             child: StreamBuilder<QuerySnapshot>(
               stream: FirebaseFirestore.instance
@@ -110,7 +119,7 @@ class _NoticiasPageState extends State<NoticiasPage> {
                 if (snapshot.connectionState == ConnectionState.waiting) {
                   return const Center(child: CircularProgressIndicator());
                 }
-
+ 
                 if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
                   return const Center(
                     child: Text(
@@ -120,17 +129,16 @@ class _NoticiasPageState extends State<NoticiasPage> {
                     ),
                   );
                 }
-
+ 
                 final docs = snapshot.data!.docs;
-
+ 
                 return ListView.separated(
                   padding: const EdgeInsets.symmetric(
                       vertical: 16, horizontal: 12),
                   itemCount: docs.length,
                   separatorBuilder: (_, __) => const SizedBox(height: 12),
                   itemBuilder: (context, i) {
-                    final data =
-                        docs[i].data() as Map<String, dynamic>;
+                    final data = docs[i].data() as Map<String, dynamic>;
                     return _NoticiaCard(
                       docId: docs[i].id,
                       data: data,
@@ -145,52 +153,34 @@ class _NoticiasPageState extends State<NoticiasPage> {
           _BottomBar(),
         ],
       ),
-
-          Positioned(
-      bottom: 80,
-      right: 20,
-      child: FloatingActionButton(
-        backgroundColor: Colors.green,
-        onPressed: () => Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (_) => const AdicionarNoticiaPage(),
-          ),
-        ),
-        child: const Icon(Icons.add, color: Colors.white),
-      ),
-    ),
-  ],
-),
     );
   }
 }
-
+ 
 // ─── Card de notícia ──────────────────────────────────────────────────────────
 class _NoticiaCard extends StatelessWidget {
   final String docId;
   final Map<String, dynamic> data;
   final bool isAdmin;
   final VoidCallback onDelete;
-
+ 
   const _NoticiaCard({
     required this.docId,
     required this.data,
     required this.isAdmin,
     required this.onDelete,
   });
-
+ 
   @override
   Widget build(BuildContext context) {
     final titulo = data['titulo'] as String? ?? '';
     final resumo = data['resumo'] as String? ?? '';
     final fonte = data['fonte'] as String? ?? '';
     final ts = data['dataPublicacao'] as Timestamp?;
-    final dataFormatada =
-        ts != null ? _formatDate(ts.toDate()) : '';
+    final dataFormatada = ts != null ? _formatDate(ts.toDate()) : '';
     final imageUrl = data['imagemUrl'] as String?;
     final categoria = data['categoria'] as String? ?? 'Geral';
-
+ 
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 8),
       decoration: BoxDecoration(
@@ -201,17 +191,15 @@ class _NoticiaCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Imagem
           if (imageUrl != null && imageUrl.isNotEmpty)
             Image.network(
               imageUrl,
               height: 160,
               width: double.infinity,
               fit: BoxFit.cover,
-              errorBuilder: (_, __, ___) =>
-                  const SizedBox.shrink(),
+              errorBuilder: (_, __, ___) => const SizedBox.shrink(),
             ),
-
+ 
           Padding(
             padding: const EdgeInsets.all(14),
             child: Column(
@@ -237,36 +225,27 @@ class _NoticiaCard extends StatelessWidget {
                       ),
                     ),
                     const Spacer(),
-
                     if (isAdmin) ...[
                       IconButton(
-                        icon: const Icon(
-                          Icons.edit,
-                          color: Colors.green,
-                          size: 20,
-                        ),
+                        icon: const Icon(Icons.edit,
+                            color: Colors.green, size: 20),
                         tooltip: "Editar",
                         padding: EdgeInsets.zero,
                         constraints: const BoxConstraints(),
-                        onPressed: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (_) => AdicionarNoticiaPage(
-                                docId: docId,
-                                dadosExistentes: data,
-                              ),
+                        onPressed: () => Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => AdicionarNoticiaPage(
+                              docId: docId,
+                              dadosExistentes: data,
                             ),
-                          );
-                        },
+                          ),
+                        ),
                       ),
                       const SizedBox(width: 8),
                       IconButton(
-                        icon: const Icon(
-                          Icons.delete_outline,
-                          color: Colors.red,
-                          size: 20,
-                        ),
+                        icon: const Icon(Icons.delete_outline,
+                            color: Colors.red, size: 20),
                         tooltip: "Apagar",
                         padding: EdgeInsets.zero,
                         constraints: const BoxConstraints(),
@@ -275,42 +254,33 @@ class _NoticiaCard extends StatelessWidget {
                     ],
                   ],
                 ),
-
+ 
                 const SizedBox(height: 8),
-
-                Text(
-                  titulo,
-                  style: AppTextStyles.forumUsername,
-                ),
-
+ 
+                Text(titulo, style: AppTextStyles.forumUsername),
+ 
                 const SizedBox(height: 6),
-
+ 
                 Text(
                   resumo,
                   style: AppTextStyles.forumText,
                   maxLines: 3,
                   overflow: TextOverflow.ellipsis,
                 ),
-
+ 
                 const SizedBox(height: 10),
-
+ 
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     if (fonte.isNotEmpty)
-                      Text(
-                        '📰 $fonte',
-                        style: AppTextStyles.forumDate,
-                      ),
-                    Text(
-                      dataFormatada,
-                      style: AppTextStyles.forumDate,
-                    ),
+                      Text('📰 $fonte', style: AppTextStyles.forumDate),
+                    Text(dataFormatada, style: AppTextStyles.forumDate),
                   ],
                 ),
-
+ 
                 const SizedBox(height: 10),
-
+ 
                 Align(
                   alignment: Alignment.centerRight,
                   child: ElevatedButton.icon(
@@ -318,32 +288,23 @@ class _NoticiaCard extends StatelessWidget {
                       backgroundColor: Colors.green,
                       foregroundColor: Colors.white,
                       padding: const EdgeInsets.symmetric(
-                        horizontal: 16,
-                        vertical: 8,
-                      ),
+                          horizontal: 16, vertical: 8),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(20),
                       ),
                     ),
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (_) => NoticiaDetalhePage(
-                            docId: docId,
-                            data: data,
-                          ),
+                    onPressed: () => Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => NoticiaDetalhePage(
+                          docId: docId,
+                          data: data,
                         ),
-                      );
-                    },
-                    icon: const Icon(
-                      Icons.article_outlined,
-                      size: 16,
+                      ),
                     ),
-                    label: const Text(
-                      "Ler mais",
-                      style: TextStyle(fontWeight: FontWeight.bold),
-                    ),
+                    icon: const Icon(Icons.article_outlined, size: 16),
+                    label: const Text("Ler mais",
+                        style: TextStyle(fontWeight: FontWeight.bold)),
                   ),
                 ),
               ],
@@ -353,13 +314,13 @@ class _NoticiaCard extends StatelessWidget {
       ),
     );
   }
-
+ 
   String _formatDate(DateTime dt) =>
       '${dt.day.toString().padLeft(2, '0')}/'
       '${dt.month.toString().padLeft(2, '0')}/'
       '${dt.year}';
 }
-
+ 
 // ─── Barra inferior ───────────────────────────────────────────────────────────
 class _BottomBar extends StatelessWidget {
   @override
@@ -390,7 +351,7 @@ class _BottomBar extends StatelessWidget {
       ),
     );
   }
-
+ 
   Widget _btn(IconData icon, VoidCallback onTap) => Expanded(
         child: InkWell(
           onTap: onTap,
@@ -398,7 +359,8 @@ class _BottomBar extends StatelessWidget {
               child: Icon(icon, color: Colors.white, size: 28)),
         ),
       );
-
+ 
   Widget _div() =>
       Container(width: 1, height: 30, color: Colors.white30);
 }
+ 
